@@ -1,0 +1,40 @@
+{
+  "auth": {
+    "unexpectedError": "Wystąpił nieoczekiwany błąd.",
+    "receivedToken": "Otrzymano token"
+  },
+  "post": {
+    "unexpectedErrorPostCreation": "Wystąpił nieoczekiwany błąd podczas tworzenia postu.",
+    "failedToFetchPosts": "Nie udało się pobrać postów.",
+    "failedToFetchUserPosts": "Nie udało się pobrać postów użytkownika.",
+    "failedToFetchPostDetails": "Nie udało się pobrać szczegółów postu.",
+    "failedToUpdatePost": "Nie udało się zaktualizować postu",
+    "failedToDeletePost": "Nie udało się usunąć postu",
+    "failedToCreateComment": "Nie udało się utworzyć komentarza.",
+    "failedToUpdateComment": "Nie udało się zaktualizować komentarza.",
+    "failedToDeleteComment": "Nie udało się usunąć komentarza.",
+    "failedToFetchComments": "Nie udało się pobrać komentarzy.",
+    "failedToLikeComment": "Nie udało się polubić komentarza.",
+    "failedToUnlikeComment": "Nie udało się cofnąć polubienia komentarza.",
+    "failedToLikePost": "Nie udało się polubić postu.",
+    "failedToUnlikePost": "Nie udało się cofnąć polubienia postu."
+  },
+  "user": {
+    "failedToFetchUserProfile": "Nie udało się pobrać profilu użytkownika.",
+    "failedToFollowUser": "Nie udało się zaobserwować użytkownika.",
+    "failedToUnfollowUser": "Nie udało się przestać obserwować użytkownika.",
+    "failedToGetRecommendedUsers": "Nie udało się pobrać rekomendowanych użytkowników.",
+    "failedToGetUserProfile": "Nie udało się pobrać profilu użytkownika."
+  },
+  "wallpaper": {
+    "failedToLoadWallpapers": "Nie udało się załadować tapet"
+  },
+  "verse": {
+    "failedToLoadVerses": "Nie udało się załadować wersetów",
+    "failedToLikeVerse": "Nie udało się polubić wersetu",
+    "failedToUnlikeVerse": "Nie udało się cofnąć polubienia wersetu"
+  },
+  "admin": {
+    "failedToLoadBooks": "Nie udało się załadować książek"
+  }
+}

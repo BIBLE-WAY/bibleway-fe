@@ -1,0 +1,34 @@
+{
+  "title": "Gebedsverzoek",
+  "labels": {
+    "description": "Beschrijving",
+    "name": "Naam",
+    "email": "E-mail",
+    "phoneNumber": "Telefoonnummer (optioneel)",
+    "media": "Media (Optioneel)"
+  },
+  "placeholders": {
+    "enterDescription": "Bid alsjeblieft voor de gezondheid van mijn familie...",
+    "yourName": "Je naam",
+    "yourEmail": "Je e-mailadres",
+    "phoneNumber": "0123456789"
+  },
+  "upload": {
+    "uploadText": "Upload afbeeldingen of video's (Max 5 bestanden, 10MB elk)",
+    "addMoreFiles": "+ Meer bestanden toevoegen"
+  },
+  "buttons": {
+    "submitPrayerRequest": "Verzoek Verzenden",
+    "submitting": "Verzenden..."
+  },
+  "errors": {
+    "descriptionRequired": "Voer een beschrijving in voor je gebedsverzoek.",
+    "failedToCreateRequest": "Aanmaken van gebedsverzoek mislukt.",
+    "maxFilesExceeded": "Je kunt maximaal 5 bestanden uploaden.",
+    "invalidFileType": "Ongeldig bestandstype: {{filename}}. Alleen afbeeldingen en video's zijn toegestaan.",
+    "fileSizeExceeded": "Bestandsgrootte overschrijdt de limiet van 10MB: {{filename}}"
+  },
+  "success": {
+    "requestCreated": "Gebedsverzoek succesvol aangemaakt!"
+  }
+}

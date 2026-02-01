@@ -1,0 +1,40 @@
+{
+  "auth": {
+    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
+    "receivedToken": "Token empfangen"
+  },
+  "post": {
+    "unexpectedErrorPostCreation": "Ein unerwarteter Fehler ist während der Beitragserstellung aufgetreten.",
+    "failedToFetchPosts": "Beiträge konnten nicht abgerufen werden.",
+    "failedToFetchUserPosts": "Benutzerbeiträge konnten nicht abgerufen werden.",
+    "failedToFetchPostDetails": "Beitragsdetails konnten nicht abgerufen werden.",
+    "failedToUpdatePost": "Beitrag konnte nicht aktualisiert werden",
+    "failedToDeletePost": "Beitrag konnte nicht gelöscht werden",
+    "failedToCreateComment": "Kommentar konnte nicht erstellt werden.",
+    "failedToUpdateComment": "Kommentar konnte nicht aktualisiert werden.",
+    "failedToDeleteComment": "Kommentar konnte nicht gelöscht werden.",
+    "failedToFetchComments": "Kommentare konnten nicht abgerufen werden.",
+    "failedToLikeComment": "Kommentar konnte nicht geliked werden.",
+    "failedToUnlikeComment": "Like vom Kommentar konnte nicht entfernt werden.",
+    "failedToLikePost": "Beitrag konnte nicht geliked werden.",
+    "failedToUnlikePost": "Like vom Beitrag konnte nicht entfernt werden."
+  },
+  "user": {
+    "failedToFetchUserProfile": "Benutzerprofil konnte nicht abgerufen werden.",
+    "failedToFollowUser": "Benutzer konnte nicht gefolgt werden.",
+    "failedToUnfollowUser": "Benutzer konnte nicht entfolgt werden.",
+    "failedToGetRecommendedUsers": "Empfohlene Benutzer konnten nicht abgerufen werden.",
+    "failedToGetUserProfile": "Benutzerprofil konnte nicht abgerufen werden."
+  },
+  "wallpaper": {
+    "failedToLoadWallpapers": "Hintergrundbilder konnten nicht geladen werden"
+  },
+  "verse": {
+    "failedToLoadVerses": "Verse konnten nicht geladen werden",
+    "failedToLikeVerse": "Vers konnte nicht geliked werden",
+    "failedToUnlikeVerse": "Like vom Vers konnte nicht entfernt werden"
+  },
+  "admin": {
+    "failedToLoadBooks": "Bücher konnten nicht geladen werden"
+  }
+}

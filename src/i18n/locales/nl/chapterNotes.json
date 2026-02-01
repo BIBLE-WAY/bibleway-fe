@@ -1,0 +1,33 @@
+{
+  "title": "Hoofdstuk Notities",
+  "noBookSelected": "Geen boek geselecteerd",
+  "selectBookMessage": "Selecteer een boek om notities te bekijken",
+  "noChapterSelected": "Geen hoofdstuk geselecteerd",
+  "selectChapterMessage": "Selecteer een hoofdstuk om notities te bekijken en te maken",
+  "loadingNotes": "Notities laden...",
+  "noNotesYet": "Nog geen notities",
+  "startWritingMessage": "Begin met het opschrijven van je gedachten en inzichten over dit hoofdstuk",
+  "placeholder": "Schrijf je notities hier...",
+  "cancel": "Annuleren",
+  "saving": "Opslaan...",
+  "updateNote": "Notitie bijwerken",
+  "saveNote": "Notitie opslaan",
+  "editNote": "Notitie bewerken",
+  "deleteNote": "Notitie verwijderen",
+  "justNow": "Zojuist",
+  "note": "notitie",
+  "notes": "notities",
+  "deleteConfirmation": "Weet je zeker dat je deze notitie wilt verwijderen?",
+  "success": {
+    "noteCreated": "Notitie succesvol aangemaakt",
+    "noteUpdated": "Notitie succesvol bijgewerkt",
+    "noteDeleted": "Notitie succesvol verwijderd"
+  },
+  "errors": {
+    "failedToLoad": "Laden van notities mislukt",
+    "failedToCreate": "Aanmaken van notitie mislukt",
+    "failedToUpdate": "Bijwerken van notitie mislukt",
+    "failedToDelete": "Verwijderen van notitie mislukt",
+    "failedToSave": "Opslaan van notitie mislukt"
+  }
+}

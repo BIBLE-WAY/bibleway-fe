@@ -1,0 +1,23 @@
+{
+  "edit": "Edit",
+  "delete": "Delete",
+  "deleteConfirm": "Delete this post?",
+  "cancel": "Cancel",
+  "save": "Save",
+  "saving": "Saving...",
+  "deleting": "Deleting...",
+  "likes": "Likes",
+  "like": "Like",
+  "comments": "Comments",
+  "comment": "Comment",
+  "share": "Share",
+  "shares": "Shares",
+  "writeComment": "Write a comment...",
+  "writeYourComment": "Write your comment...",
+  "failedToComment": "Failed to comment",
+  "actionFailed": "Action failed",
+  "commentAdded": "Comment added successfully",
+  "failedToCreateComment": "Failed to create comment",
+  "failedToUpdateLike": "Failed to update like status"
+}
+

@@ -1,0 +1,27 @@
+{
+  "title": "Bericht Maken",
+  "labels": {
+    "title": "Titel",
+    "description": "Beschrijving"
+  },
+  "placeholders": {
+    "enterPostTitle": "Voer de berichttitel in...",
+    "enterDescription": "Ik heb een baan gekregen bij Google..."
+  },
+  "upload": {
+    "uploadFiles": "Upload je bestanden hier (Max 5)",
+    "addMoreFiles": "+ Meer bestanden toevoegen"
+  },
+  "buttons": {
+    "createPost": "Bericht Maken",
+    "creating": "Maken..."
+  },
+  "errors": {
+    "maxFilesExceeded": "Je kunt maximaal 5 bestanden uploaden.",
+    "atLeastOneFile": "Upload ten minste één mediabestand.",
+    "failedToCreatePost": "Maken van bericht mislukt."
+  },
+  "success": {
+    "postCreated": "Bericht succesvol aangemaakt!"
+  }
+}

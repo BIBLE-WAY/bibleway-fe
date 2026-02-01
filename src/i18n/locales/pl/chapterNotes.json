@@ -1,0 +1,33 @@
+{
+  "title": "Notatki rozdziałów",
+  "noBookSelected": "Nie wybrano książki",
+  "selectBookMessage": "Wybierz książkę, aby zobaczyć notatki",
+  "noChapterSelected": "Nie wybrano rozdziału",
+  "selectChapterMessage": "Wybierz rozdział, aby przeglądać i tworzyć notatki",
+  "loadingNotes": "Ładowanie notatek...",
+  "noNotesYet": "Brak notatek",
+  "startWritingMessage": "Zacznij pisać swoje myśli i spostrzeżenia dotyczące tego rozdziału",
+  "placeholder": "Napisz swoje notatki tutaj...",
+  "cancel": "Anuluj",
+  "saving": "Zapisywanie...",
+  "updateNote": "Zaktualizuj notatkę",
+  "saveNote": "Zapisz notatkę",
+  "editNote": "Edytuj notatkę",
+  "deleteNote": "Usuń notatkę",
+  "justNow": "Przed chwilą",
+  "note": "notatka",
+  "notes": "notatki",
+  "deleteConfirmation": "Czy na pewno chcesz usunąć tę notatkę?",
+  "success": {
+    "noteCreated": "Notatka utworzona pomyślnie",
+    "noteUpdated": "Notatka zaktualizowana pomyślnie",
+    "noteDeleted": "Notatka usunięta pomyślnie"
+  },
+  "errors": {
+    "failedToLoad": "Nie udało się załadować notatek",
+    "failedToCreate": "Nie udało się utworzyć notatki",
+    "failedToUpdate": "Nie udało się zaktualizować notatki",
+    "failedToDelete": "Nie udało się usunąć notatki",
+    "failedToSave": "Nie udało się zapisać notatki"
+  }
+}

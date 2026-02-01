@@ -1,0 +1,10 @@
+{
+  "list": "Lista",
+  "bookmark": "Zakładka",
+  "quickNote": "Szybka notatka",
+  "noChaptersAvailable": "Brak dostępnych rozdziałów",
+  "chapter": "Rozdział",
+  "noChapterSelected": "Nie wybrano rozdziału",
+  "selectChapterToBegin": "Wybierz rozdział z paska bocznego, aby rozpocząć czytanie",
+  "ttsLanguage": "Język TTS:"
+}

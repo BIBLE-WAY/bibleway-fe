@@ -1,0 +1,21 @@
+{
+  "welcome": "Welkom",
+  "login": "Inloggen",
+  "signup": "Aanmelden",
+  "logout": "Uitloggen",
+  "home": "Home",
+  "profile": "Profiel",
+  "settings": "Instellingen",
+  "save": "Opslaan",
+  "cancel": "Annuleren",
+  "delete": "Verwijderen",
+  "edit": "Bewerken",
+  "submit": "Verzenden",
+  "loading": "Laden...",
+  "error": "Fout",
+  "success": "Succes",
+  "linkCopied": "Link gekopieerd naar klembord!",
+  "failedToCopy": "Link kopiëren mislukt",
+  "sharePost": "Bericht delen",
+  "sharePrayerRequest": "Gebedsverzoek delen"
+}

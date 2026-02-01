@@ -1,0 +1,40 @@
+{
+  "auth": {
+    "unexpectedError": "Er is een onverwachte fout opgetreden.",
+    "receivedToken": "Token Ontvangen"
+  },
+  "post": {
+    "unexpectedErrorPostCreation": "Er is een onverwachte fout opgetreden tijdens het maken van het bericht.",
+    "failedToFetchPosts": "Ophalen van berichten mislukt.",
+    "failedToFetchUserPosts": "Ophalen van gebruikersberichten mislukt.",
+    "failedToFetchPostDetails": "Ophalen van berichtdetails mislukt.",
+    "failedToUpdatePost": "Bijwerken van bericht mislukt",
+    "failedToDeletePost": "Verwijderen van bericht mislukt",
+    "failedToCreateComment": "Maken van reactie mislukt.",
+    "failedToUpdateComment": "Bijwerken van reactie mislukt.",
+    "failedToDeleteComment": "Verwijderen van reactie mislukt.",
+    "failedToFetchComments": "Ophalen van reacties mislukt.",
+    "failedToLikeComment": "Vind-ik-leuk op reactie mislukt.",
+    "failedToUnlikeComment": "Vind-ik-leuk verwijderen op reactie mislukt.",
+    "failedToLikePost": "Vind-ik-leuk op bericht mislukt.",
+    "failedToUnlikePost": "Vind-ik-leuk verwijderen op bericht mislukt."
+  },
+  "user": {
+    "failedToFetchUserProfile": "Ophalen van gebruikersprofiel mislukt.",
+    "failedToFollowUser": "Volgen van gebruiker mislukt.",
+    "failedToUnfollowUser": "Ontvolgen van gebruiker mislukt.",
+    "failedToGetRecommendedUsers": "Ophalen van aanbevolen gebruikers mislukt.",
+    "failedToGetUserProfile": "Ophalen van gebruikersprofiel mislukt."
+  },
+  "wallpaper": {
+    "failedToLoadWallpapers": "Laden van achtergronden mislukt"
+  },
+  "verse": {
+    "failedToLoadVerses": "Laden van verzen mislukt",
+    "failedToLikeVerse": "Vind-ik-leuk op vers mislukt",
+    "failedToUnlikeVerse": "Vind-ik-leuk verwijderen op vers mislukt"
+  },
+  "admin": {
+    "failedToLoadBooks": "Laden van boeken mislukt"
+  }
+}

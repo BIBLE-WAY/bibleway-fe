@@ -1,0 +1,1599 @@
+import React, { useEffect, useRef, useState, useMemo, useLayoutEffect, useCallback } from "react";
+import type { Chapter } from "../../../services/book/book.service";
+import { bookService } from "../../../services/book/book.service";
+import { useI18n } from '../../../i18n';
+import { toggleBookmark } from "../../../services/book/toggleBookmark";
+import { highlightContent, highlightMultipleWords } from "../utils/highlightUtils";
+import { extractAllPageText } from "../utils/pageTextUtils";
+import { useSearch } from "../../../contexts/SearchContext";
+import { useBook } from "../../../contexts/BookContext";
+import { showSuccess, showError } from "../../../utils/toast";
+import { textToSpeechService } from "../../../services/textToSpeech/textToSpeech.service";
+import { getYouTubeEmbedUrl } from "../../../utils/youtubeHelpers";
+import { highlightService } from "../../../services/highlight/highlight.service";
+import type { Highlight } from "../../../types/highlight";
+import { bookmarkService } from "../../../services/bookmark/bookmark.service";
+import BookMarkIcon from "../../../Icons/BookMarkIcon";
+import {
+  ContentContainer,
+  ChapterHeader,
+  ChapterTitle,
+  ChapterDescription,
+  ChapterMeta,
+  MetaItem,
+  BlocksContainer,
+  PageContainer,
+  BlockItem,
+  VideoContainer,
+  EmptyState,
+  EmptyStateIcon,
+  EmptyStateText,
+  EmptyStateSubtext,
+  PageWrapper,
+  PagePlayButton,
+  LoadingSpinner,
+  BookmarkButton,
+  LikeButton,
+  FeedbackButton,
+  HeaderActions,
+  HighlightButton,
+  ColorPickerContainer,
+  ColorPickerLabel,
+  ColorOptions,
+  ColorOption,
+} from "./ChapterContent.styles";
+import { markdownToHtml } from "../../../utils/markdown/markdownToHTML";
+import "github-markdown-css/github-markdown-light.css";
+import { t } from "i18next";
+import { FaThumbsUp } from 'react-icons/fa';
+import { AiOutlineLike } from 'react-icons/ai';
+import { MdFeedback } from 'react-icons/md';
+import ChapterFeedbackModal from '../../../components/ChapterFeedbackModal/ChapterFeedbackModal';
+
+interface ChapterContentProps {
+  chapter: Chapter | null;
+  chapterIndex?: number;
+  totalChapters?: number;
+  categoryName?: string;
+}
+
+interface Block {
+  blockId: string;
+  text: string;
+  markdown: string;
+}
+
+export const ChapterContent: React.FC<ChapterContentProps> = ({
+  chapter,
+  chapterIndex = 0,
+  totalChapters = 1,
+  categoryName,
+}) => {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const progressUpdateTimeout = useRef<NodeJS.Timeout | null>(null);
+  const appliedHighlightIdsRef = useRef<Set<string>>(new Set());
+  const highlightApplicationFrameRef = useRef<number | null>(null);
+
+  const { searchText, highlightWords } = useSearch();
+  const { isBookmarked, setIsBookmarked, setBookmarkId } = useBook();
+
+  // Use highlightWords if available, otherwise fallback to searchText
+  const highlightQuery = highlightWords.length > 0 ? null : searchText;
+
+  const [isHighlightMode, setIsHighlightMode] = useState(false);
+  const [selectedColor, setSelectedColor] = useState<
+    "yellow" | "green" | "blue"
+  >("green");
+  const [isBookmarking, setIsBookmarking] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [isLiking, setIsLiking] = useState(false);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [highlights, setHighlights] = useState<Highlight[]>([]);
+  const [isLoadingHighlights, setIsLoadingHighlights] = useState(false);
+  const [chapterMetadata, setChapterMetadata] = useState<Record<string, unknown> | null>(null);
+  const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
+
+  /* ---------------- Text-to-Speech State ---------------- */
+  const [selectedPages, setSelectedPages] = useState<Set<number>>(new Set());
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [currentPlayingPage, setCurrentPlayingPage] = useState<number | null>(
+    null
+  );
+  const [isPaused, setIsPaused] = useState(false);
+  const [generatingPage, setGeneratingPage] = useState<number | null>(null);
+  const [selectedTTSLanguage, setSelectedTTSLanguage] =
+    useState<string>("en-US");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
+  const generationAbortControllerRef = useRef<AbortController | null>(null);
+  const textChunksRef = useRef<string[]>([]);
+  const currentChunkIndexRef = useRef<number>(0);
+
+  const BLOCKS_PER_PAGE = 16;
+
+  function highlightByOffsets(
+    block: HTMLElement,
+    startOffset: number,
+    endOffset: number,
+    color: string,
+    highlightId?: string
+  ) {
+    const blockTextLength = getBlockTextLength(block);
+    if (startOffset < 0 || endOffset < 0 || startOffset >= blockTextLength || endOffset > blockTextLength || startOffset >= endOffset) {
+      console.warn("Invalid offsets for highlight:", { startOffset, endOffset, blockTextLength });
+      return;
+    }
+
+    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, null);
+
+    let currentOffset = 0;
+    const segments: { node: Text; start: number; end: number }[] = [];
+
+    while (walker.nextNode()) {
+      const node = walker.currentNode as Text;
+      const nextOffset = currentOffset + node.length;
+
+      if (endOffset > currentOffset && startOffset < nextOffset) {
+        segments.push({
+          node,
+          start: Math.max(0, startOffset - currentOffset),
+          end: Math.min(node.length, endOffset - currentOffset),
+        });
+      }
+      currentOffset = nextOffset;
+    }
+
+    for (const { node, start, end } of segments.reverse()) {
+      // Skip if start >= end (invalid range)
+      if (start >= end) continue;
+
+      // Check if the text node is already inside a highlight span
+      let currentNode: Node | null = node;
+      let isInsideHighlight = false;
+      while (currentNode && currentNode !== block) {
+        if (currentNode.nodeType === Node.ELEMENT_NODE) {
+          const element = currentNode as HTMLElement;
+          if (element.classList && element.classList.contains("highlight")) {
+            // Already inside a highlight, skip this segment
+            isInsideHighlight = true;
+            break;
+          }
+        }
+        currentNode = currentNode.parentNode;
+      }
+      
+      if (isInsideHighlight) continue;
+
+      const range = document.createRange();
+      range.setStart(node, start);
+      range.setEnd(node, end);
+
+      const span = document.createElement("span");
+      span.className = "highlight";
+      span.style.backgroundColor = color;
+      span.style.padding = "0 2px";
+      span.style.borderRadius = "3px";
+      if (highlightId) {
+        span.setAttribute("data-highlight-id", highlightId);
+      }
+
+      try {
+        range.surroundContents(span);
+      } catch (error) {
+        // Fallback for complex DOM structures (e.g., when range spans element boundaries)
+        let contents: DocumentFragment | null = null;
+        try {
+          contents = range.extractContents();
+          span.appendChild(contents);
+          range.insertNode(span);
+        } catch (fallbackError) {
+          console.warn("Failed to apply highlight:", fallbackError);
+          // Restore extracted contents if insertion failed
+          if (contents && contents.childNodes.length > 0) {
+            range.insertNode(contents);
+          }
+        }
+      }
+    }
+  }
+
+  function removeAllHighlightsFromDOM() {
+    const highlights = document.querySelectorAll(".highlight");
+    const parentsToNormalize = new Set<Node>();
+    
+    highlights.forEach((span) => {
+      const parent = span.parentNode;
+      if (!parent) return;
+
+      while (span.firstChild) {
+        parent.insertBefore(span.firstChild, span);
+      }
+      parent.removeChild(span);
+      parentsToNormalize.add(parent);
+    });
+    
+    // Normalize all affected parents to merge fragmented text nodes
+    parentsToNormalize.forEach((parent) => {
+      parent.normalize();
+    });
+  }
+
+  /* ---------------- Text selection highlight ---------------- */
+
+  // Load highlights from API
+  const loadHighlightsFromAPI = useCallback(async (bookId: string, chapterId: string) => {
+    setIsLoadingHighlights(true);
+    try {
+      const loadedHighlights = await highlightService.getHighlightsByChapter(bookId, chapterId);
+      setHighlights(loadedHighlights);
+    } catch (error) {
+      console.error("Error loading highlights:", error);
+      showError("Failed to load highlights");
+      setHighlights([]);
+    } finally {
+      setIsLoadingHighlights(false);
+    }
+  }, []);
+
+  function highlightByBlockIds({
+  startBlockId,
+  endBlockId,
+  startOffset,
+  endOffset,
+  color,
+  highlightId,
+}: {
+  startBlockId: string;
+  endBlockId: string;
+  startOffset: number;
+  endOffset: number;
+  color: string;
+  highlightId?: string;
+}) {
+  const blocks = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-block-id]")
+  );
+
+  const startIndex = blocks.findIndex(
+    b => b.dataset.blockId === startBlockId
+  );
+  const endIndex = blocks.findIndex(
+    b => b.dataset.blockId === endBlockId
+  );
+
+  if (startIndex === -1 || endIndex === -1) return;
+
+  const ordered = blocks.slice(
+    Math.min(startIndex, endIndex),
+    Math.max(startIndex, endIndex) + 1
+  );
+
+  ordered.forEach((block, i) => {
+    let start = 0;
+    let end = getBlockTextLength(block);
+
+    if (i === 0) start = startOffset;
+    if (i === ordered.length - 1) end = endOffset;
+
+    if (start < end) {
+      highlightByOffsets(block, start, end, color, highlightId);
+    }
+  });
+}
+
+function getBlockTextLength(block: HTMLElement) {
+  const walker = document.createTreeWalker(
+    block,
+    NodeFilter.SHOW_TEXT,
+    null
+  );
+  let len = 0;
+  while (walker.nextNode()) {
+    len += (walker.currentNode as Text).length;
+  }
+  return len;
+}
+
+  const handleMouseUp = () => {
+      // Only create highlights if highlight mode is active
+      if (!isHighlightMode) return;
+
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+
+      const range = selection.getRangeAt(0);
+      if (range.collapsed) return;
+
+      // Validate that selection contains non-whitespace characters
+      const selectedText = selection.toString().trim();
+      if (!selectedText || selectedText.length === 0) {
+        selection.removeAllRanges();
+        return;
+      }
+
+      const getBlock = (node: Node) =>
+        (node as HTMLElement)?.parentElement?.closest(
+          "[data-block-id]"
+        ) as HTMLElement | null;
+
+      const startBlock = getBlock(range.startContainer);
+      const endBlock = getBlock(range.endContainer);
+      if (!startBlock || !endBlock) {
+        selection.removeAllRanges();
+        return;
+      }
+
+      const startBlockId = startBlock.getAttribute("data-block-id");
+      const endBlockId = endBlock.getAttribute("data-block-id");
+      
+      if (!startBlockId || !endBlockId) {
+        selection.removeAllRanges();
+        return;
+      }
+
+      const blocks = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-block-id]")
+      );
+
+      const startIndex = blocks.indexOf(startBlock);
+      const endIndex = blocks.indexOf(endBlock);
+      if (startIndex === -1 || endIndex === -1) return;
+
+      const orderedBlocks = blocks.slice(
+        Math.min(startIndex, endIndex),
+        Math.max(startIndex, endIndex) + 1
+      );
+
+      // Calculate startOffset (relative to start block)
+      let startOffset = 0;
+      const startBlockWalker = document.createTreeWalker(
+        startBlock,
+        NodeFilter.SHOW_TEXT,
+        null
+      );
+      let startOffsetCalc = 0;
+      while (startBlockWalker.nextNode()) {
+        const node = startBlockWalker.currentNode as Text;
+        if (node === range.startContainer) {
+          startOffset = startOffsetCalc + range.startOffset;
+          break;
+        }
+        startOffsetCalc += node.length;
+      }
+
+      // Calculate endOffset (relative to end block)
+      let endOffset = 0;
+      if (startBlockId === endBlockId) {
+        // Same block - calculate endOffset relative to start block
+        const endBlockWalker = document.createTreeWalker(
+          endBlock,
+          NodeFilter.SHOW_TEXT,
+          null
+        );
+        let endOffsetCalc = 0;
+        while (endBlockWalker.nextNode()) {
+          const node = endBlockWalker.currentNode as Text;
+          if (node === range.endContainer) {
+            endOffset = endOffsetCalc + range.endOffset;
+            break;
+          }
+          endOffsetCalc += node.length;
+        }
+      } else {
+        // Different blocks - calculate endOffset relative to end block
+        const endBlockWalker = document.createTreeWalker(
+          endBlock,
+          NodeFilter.SHOW_TEXT,
+          null
+        );
+        let endOffsetCalc = 0;
+        while (endBlockWalker.nextNode()) {
+          const node = endBlockWalker.currentNode as Text;
+          if (node === range.endContainer) {
+            endOffset = endOffsetCalc + range.endOffset;
+            break;
+          }
+          endOffsetCalc += node.length;
+        }
+      }
+
+      // Map color to hex values
+      const colorMap: Record<string, string> = {
+        yellow: "#FEF08A",
+        green: "#86EFAC",
+        blue: "#93C5FD",
+      };
+      const hexColor = colorMap[selectedColor] || colorMap.green;
+
+      // Create highlight via API
+      if (chapter) {
+        const highlightRequest = {
+          book_id: chapter.book_id,
+          chapter_id: chapter.chapter_id,
+          start_block_id: startBlockId,
+          end_block_id: endBlockId,
+          start_offset: startOffset.toString(),
+          end_offset: endOffset.toString(),
+          color: hexColor,
+        };
+
+        // Save highlight to backend
+        highlightService.createHighlight(highlightRequest)
+          .then((highlightId) => {
+            if (highlightId) {
+              // Apply highlight to DOM after successful save
+              highlightByBlockIds({
+                startBlockId,
+                endBlockId,
+                startOffset,
+                endOffset,
+                color: hexColor,
+              });
+
+              // Reload highlights from API to get the complete highlight object
+              loadHighlightsFromAPI(chapter.book_id, chapter.chapter_id);
+              showSuccess("Highlight saved");
+            } else {
+              showError("Failed to save highlight");
+            }
+          })
+          .catch((error) => {
+            console.error("Error creating highlight:", error);
+            showError("Failed to save highlight");
+          });
+      }
+
+      selection.removeAllRanges();
+    };
+
+  useEffect(() => {
+    // Add both mouse and touch event listeners for mobile support
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("touchend", handleMouseUp);
+    
+    return () => {
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchend", handleMouseUp);
+    };
+  }, [isHighlightMode, selectedColor, chapter, loadHighlightsFromAPI]);
+
+  // Load highlights from API when chapter changes
+  useEffect(() => {
+    if (!chapter?.chapter_id || !chapter?.book_id) return;
+    loadHighlightsFromAPI(chapter.book_id, chapter.chapter_id);
+  }, [chapter?.chapter_id, chapter?.book_id, loadHighlightsFromAPI]);
+
+  // Load chapter metadata when chapter changes
+  useEffect(() => {
+    if (!chapter?.chapter_id) {
+      setChapterMetadata(null);
+      setIsLiked(false);
+      setLikeCount(0);
+      return;
+    }
+
+    const fetchMetadata = async () => {
+      setIsLoadingMetadata(true);
+      try {
+        const response = await bookService.getChapterMetadata(chapter.chapter_id);
+        if (response.success && response.data) {
+          // Return empty object {} if metadata is null (as per spec)
+          setChapterMetadata(response.data.metadata || {});
+          // Extract like_count and is_liked from the data object
+          setIsLiked(response.data.is_liked || false);
+          setLikeCount(response.data.like_count || 0);
+        } else {
+          console.error('Failed to fetch chapter metadata:', response.error || response.message);
+          setChapterMetadata({});
+          setIsLiked(false);
+          setLikeCount(0);
+        }
+      } catch (error) {
+        console.error('Error fetching chapter metadata:', error);
+        setChapterMetadata({});
+        setIsLiked(false);
+        setLikeCount(0);
+      } finally {
+        setIsLoadingMetadata(false);
+      }
+    };
+
+    fetchMetadata();
+  }, [chapter?.chapter_id]);
+
+  const blocks =
+    (chapterMetadata as { blocks?: Block[] } | undefined)?.blocks || [];
+
+  // Apply loaded highlights to DOM after blocks are rendered
+  useLayoutEffect(() => {
+    if (!chapter || blocks.length === 0) {
+      // Clear applied highlights when chapter or blocks are not available
+      appliedHighlightIdsRef.current.clear();
+      return;
+    }
+
+    if (highlights.length === 0) {
+      // Remove all highlights if no highlights exist
+      removeAllHighlightsFromDOM();
+      appliedHighlightIdsRef.current.clear();
+      return;
+    }
+
+    // Cancel any pending animation frame
+    if (highlightApplicationFrameRef.current !== null) {
+      cancelAnimationFrame(highlightApplicationFrameRef.current);
+    }
+
+    // Wait for blocks to be rendered in DOM, then use requestAnimationFrame for smooth updates
+    const timer = setTimeout(() => {
+      highlightApplicationFrameRef.current = requestAnimationFrame(() => {
+        // Get current highlight IDs
+        const currentHighlightIds = new Set(
+          highlights
+            .map(h => h.id || h.highlight_id)
+            .filter((id): id is string => !!id)
+        );
+
+        // Find highlights that were removed (exist in applied but not in current)
+        const removedIds = Array.from(appliedHighlightIdsRef.current).filter(
+          id => !currentHighlightIds.has(id)
+        );
+
+        // Find highlights that are new or changed (exist in current but not in applied, or changed)
+        const newOrChangedHighlights = highlights.filter(highlight => {
+          const highlightId = highlight.id || highlight.highlight_id;
+          if (!highlightId) return false;
+          
+          // Check if it's a new highlight
+          if (!appliedHighlightIdsRef.current.has(highlightId)) {
+            return true;
+          }
+
+          // Check if highlight properties changed by comparing with DOM
+          // For simplicity, we'll re-apply if it's in the current set
+          // A more sophisticated approach would compare properties
+          return currentHighlightIds.has(highlightId);
+        });
+
+        // Remove highlights that no longer exist
+        if (removedIds.length > 0) {
+          removedIds.forEach(id => {
+            const highlightElements = document.querySelectorAll(`[data-highlight-id="${id}"]`);
+            highlightElements.forEach(span => {
+              const parent = span.parentNode;
+              if (!parent) return;
+              while (span.firstChild) {
+                parent.insertBefore(span.firstChild, span);
+              }
+              parent.removeChild(span);
+              parent.normalize();
+            });
+          });
+        }
+
+        // Only remove and re-apply if there are changes
+        if (removedIds.length > 0 || newOrChangedHighlights.length > 0) {
+          // Remove only the changed highlights from DOM, then re-apply
+          newOrChangedHighlights.forEach(highlight => {
+            const highlightId = highlight.id || highlight.highlight_id;
+            if (highlightId) {
+              // Remove existing highlight with this ID if it exists
+              const existingElements = document.querySelectorAll(`[data-highlight-id="${highlightId}"]`);
+              existingElements.forEach(span => {
+                const parent = span.parentNode;
+                if (!parent) return;
+                while (span.firstChild) {
+                  parent.insertBefore(span.firstChild, span);
+                }
+                parent.removeChild(span);
+                parent.normalize();
+              });
+            }
+          });
+
+          // Apply new or changed highlights
+          newOrChangedHighlights.forEach((highlight) => {
+            // Handle null values from API - skip if block IDs are null
+            const startBlockId = highlight.start_block_id ?? highlight.blockId ?? null;
+            const endBlockId = highlight.end_block_id ?? highlight.blockId ?? null;
+            
+            if (!startBlockId || !endBlockId) {
+              return; // Skip highlights without valid block IDs
+            }
+            
+            const startOffset = typeof highlight.startOffset === 'number' 
+              ? highlight.startOffset 
+              : parseInt(highlight.start_offset || "0", 10);
+            const endOffset = typeof highlight.endOffset === 'number'
+              ? highlight.endOffset
+              : parseInt(highlight.end_offset || "0", 10);
+
+            const highlightId = highlight.id || highlight.highlight_id;
+            
+            // Apply highlight with ID for tracking
+            highlightByBlockIds({
+              startBlockId,
+              endBlockId,
+              startOffset,
+              endOffset,
+              color: highlight.color,
+              highlightId: highlightId || undefined,
+            });
+          });
+
+          // Update applied highlights tracking
+          appliedHighlightIdsRef.current = new Set(currentHighlightIds);
+        }
+      });
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      if (highlightApplicationFrameRef.current !== null) {
+        cancelAnimationFrame(highlightApplicationFrameRef.current);
+      }
+    };
+  }, [chapter, highlights, blocks]);
+
+  /* ---------------- Check Bookmark Status on Chapter Load ---------------- */
+  useEffect(() => {
+    if (!chapter?.book_id) return;
+
+    const checkBookmarkStatus = async () => {
+      try {
+        const response = await bookmarkService.getAllBookmarks();
+        if (response.success && response.bookmarks) {
+          const bookmarkedBook = response.bookmarks.find(
+            (bookmark) => bookmark.book_id === chapter.book_id
+          );
+          if (bookmarkedBook) {
+            setIsBookmarked(true);
+            setBookmarkId(bookmarkedBook.bookmark_id);
+          } else {
+            setIsBookmarked(false);
+            setBookmarkId(null);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to check bookmark status:", error);
+      }
+    };
+
+    checkBookmarkStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chapter?.book_id]);
+
+  const processedBlocks = useMemo(() => {
+    return blocks.map((block) => {
+      let html = markdownToHtml(block.markdown);
+      // Use highlightWords if available, otherwise use highlightQuery (searchText)
+      if (highlightWords.length > 0) {
+        html = highlightMultipleWords(html, highlightWords);
+      } else if (highlightQuery) {
+        html = highlightContent(html, highlightQuery);
+      }
+      return { ...block, html };
+    });
+  }, [blocks, highlightWords, highlightQuery]);
+
+  const pages = useMemo(() => {
+    const groups: (typeof processedBlocks)[] = [];
+    for (let i = 0; i < processedBlocks.length; i += BLOCKS_PER_PAGE) {
+      groups.push(processedBlocks.slice(i, i + BLOCKS_PER_PAGE));
+    }
+    return groups;
+  }, [processedBlocks]);
+
+  const pageTexts = useMemo(() => {
+    return pages.map((page, pageIndex) => {
+      const pageBlocks = page.map((block) => ({
+        blockId: block.blockId,
+        text: block.text,
+        markdown: block.markdown,
+      }));
+      const text = extractAllPageText(pageBlocks);
+      return {
+        pageIndex: pageIndex + 1,
+        text,
+        blockCount: page.length,
+      };
+    });
+  }, [pages]);
+
+
+  useEffect(() => {
+    // Check if we have either highlightWords or highlightQuery to scroll to
+    const hasHighlights = highlightWords.length > 0 || highlightQuery;
+    if (!hasHighlights || !chapter) return;
+
+    const timer = setTimeout(() => {
+      const firstMatch = document.querySelector(".highlight-match");
+      firstMatch?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [highlightWords, highlightQuery, chapter]);
+
+
+  const handleBookmark = async () => {
+    if (!chapter || isBookmarking) return;
+
+    setIsBookmarking(true);
+    try {
+      const response = await toggleBookmark(chapter.book_id);
+      if (response.success && response.data) {
+        if (response.data.action === "created") {
+          showSuccess("Bookmark created successfully");
+          setIsBookmarked(true);
+          setBookmarkId(response.data.bookmark_id || null);
+        } else {
+          showSuccess("Bookmark removed successfully");
+          setIsBookmarked(false);
+          setBookmarkId(null);
+        }
+      } else {
+        showError(response.error || "Failed to update bookmark");
+      }
+    } catch {
+      showError("Failed to update bookmark");
+    } finally {
+      setIsBookmarking(false);
+    }
+  };
+
+  const handleLike = async () => {
+    if (!chapter || isLiking) return;
+
+    const prevLiked = isLiked;
+    const prevLikeCount = likeCount;
+
+    // Optimistic update
+    setIsLiked(!prevLiked);
+    setLikeCount(prevLiked ? Math.max(0, prevLikeCount - 1) : prevLikeCount + 1);
+    setIsLiking(true);
+
+    try {
+      const response = prevLiked
+        ? await bookService.unlikeChapter(chapter.chapter_id)
+        : await bookService.likeChapter(chapter.chapter_id);
+
+      if (response.success) {
+        if (prevLiked) {
+          showSuccess("Chapter unliked successfully");
+        } else {
+          showSuccess("Chapter liked successfully");
+        }
+        // State already updated optimistically
+      } else {
+        // Revert optimistic update on error
+        setIsLiked(prevLiked);
+        setLikeCount(prevLikeCount);
+        showError(response.error || response.message || "Failed to update like");
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      setIsLiked(prevLiked);
+      setLikeCount(prevLikeCount);
+      showError("Failed to update like");
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
+  const TTS_LANGUAGES = [
+    { code: "en-US", name: "English (US)" },
+    { code: "en-GB", name: "English (UK)" },
+    { code: "es-ES", name: "Spanish (Spain)" },
+    { code: "es-MX", name: "Spanish (Mexico)" },
+    { code: "te-IN", name: "Telugu (India)" },
+    { code: "hi-IN", name: "Hindi (India)" },
+    { code: "ta-IN", name: "Tamil (India)" },
+    { code: "kn-IN", name: "Kannada (India)" },
+    { code: "ml-IN", name: "Malayalam (India)" },
+    { code: "mr-IN", name: "Marathi (India)" },
+    { code: "gu-IN", name: "Gujarati (India)" },
+    { code: "bn-IN", name: "Bengali (India)" },
+    { code: "pa-IN", name: "Punjabi (India)" },
+    { code: "or-IN", name: "Odia (India)" },
+    { code: "as-IN", name: "Assamese (India)" },
+    { code: "ur-IN", name: "Urdu (India)" },
+    { code: "fr-FR", name: "French (France)" },
+    { code: "de-DE", name: "German (Germany)" },
+    { code: "it-IT", name: "Italian (Italy)" },
+    { code: "pt-PT", name: "Portuguese (Portugal)" },
+    { code: "pt-BR", name: "Portuguese (Brazil)" },
+    { code: "ru-RU", name: "Russian (Russia)" },
+    { code: "zh-CN", name: "Chinese (Mandarin)" },
+    { code: "ar-SA", name: "Arabic (Saudi Arabia)" },
+    { code: "ja-JP", name: "Japanese (Japan)" },
+    { code: "ko-KR", name: "Korean (Korea)" },
+  ];
+
+  const playAudioFromBase64 = (base64Data: string, isLastChunk: boolean = true): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      try {
+        const base64String = base64Data.includes(",")
+          ? base64Data.split(",")[1]
+          : base64Data;
+
+        const binaryString = atob(base64String);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        const blob = new Blob([bytes], { type: "audio/mp3" });
+        const url = URL.createObjectURL(blob);
+        audioUrlRef.current = url;
+
+        const audio = new Audio(url);
+        audioRef.current = audio;
+
+        audio.onended = () => {
+          // Clean up this audio URL
+          if (audioUrlRef.current) {
+            URL.revokeObjectURL(audioUrlRef.current);
+            audioUrlRef.current = null;
+          }
+          audioRef.current = null;
+          
+          // If this is the last chunk, reset all state
+          if (isLastChunk) {
+            setCurrentPlayingPage(null);
+            setIsPaused(false);
+            cleanupAudio();
+          }
+          resolve();
+        };
+
+        audio.onpause = () => {
+          setIsPaused(true);
+        };
+
+        audio.onplay = () => {
+          setIsPaused(false);
+        };
+
+        audio.onerror = (error) => {
+          console.error("Audio playback error:", error);
+          setCurrentPlayingPage(null);
+          cleanupAudio();
+          reject(new Error("Failed to play audio"));
+        };
+
+        audio.play().catch((error) => {
+          console.error("Audio play error:", error);
+          setCurrentPlayingPage(null);
+          cleanupAudio();
+          reject(error);
+        });
+      } catch (error) {
+        console.error("Error processing audio:", error);
+        reject(error);
+      }
+    });
+  };
+
+  /**
+   * Splits text into chunks that fit within the byte limit
+   * Tries to split at sentence boundaries when possible
+   */
+  const splitTextIntoChunks = (text: string, maxBytes: number): string[] => {
+    const encoder = new TextEncoder();
+    const chunks: string[] = [];
+    
+    // If text fits in one chunk, return it
+    if (encoder.encode(text).length <= maxBytes) {
+      return [text];
+    }
+    
+    // Split by sentences first (period, exclamation, question mark followed by space)
+    const sentences = text.split(/([.!?]\s+)/);
+    let currentChunk = '';
+    
+    for (let i = 0; i < sentences.length; i++) {
+      const sentence = sentences[i];
+      const testChunk = currentChunk + sentence;
+      const testBytes = encoder.encode(testChunk).length;
+      
+      if (testBytes <= maxBytes) {
+        currentChunk = testChunk;
+      } else {
+        // Current chunk is full, save it and start new one
+        if (currentChunk.trim()) {
+          chunks.push(currentChunk.trim());
+        }
+        
+        // If single sentence is too long, split by words
+        const sentenceBytes = encoder.encode(sentence).length;
+        if (sentenceBytes > maxBytes) {
+          const words = sentence.split(/(\s+)/);
+          let wordChunk = '';
+          
+          for (const word of words) {
+            const testWordChunk = wordChunk + word;
+            const testWordBytes = encoder.encode(testWordChunk).length;
+            
+            if (testWordBytes <= maxBytes) {
+              wordChunk = testWordChunk;
+            } else {
+              if (wordChunk.trim()) {
+                chunks.push(wordChunk.trim());
+              }
+              wordChunk = word;
+            }
+          }
+          
+          if (wordChunk.trim()) {
+            currentChunk = wordChunk.trim();
+          } else {
+            currentChunk = '';
+          }
+        } else {
+          currentChunk = sentence;
+        }
+      }
+    }
+    
+    // Add remaining chunk
+    if (currentChunk.trim()) {
+      chunks.push(currentChunk.trim());
+    }
+    
+    return chunks.filter(chunk => chunk.length > 0);
+  };
+
+  /**
+   * Cleans up audio resources
+   */
+  const cleanupAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
+    textChunksRef.current = [];
+    currentChunkIndexRef.current = 0;
+  };
+
+  /**
+   * Cancels ongoing generation
+   */
+  const cancelGeneration = () => {
+    if (generationAbortControllerRef.current) {
+      generationAbortControllerRef.current.abort();
+      generationAbortControllerRef.current = null;
+    }
+    // Also stop any playing audio
+    cleanupAudio();
+    setCurrentPlayingPage(null);
+    setIsPaused(false);
+    setIsGenerating(false);
+    setGeneratingPage(null);
+    textChunksRef.current = [];
+    currentChunkIndexRef.current = 0;
+  };
+
+  /**
+   * Stops current audio playback
+   */
+  const stopAudio = () => {
+    // Cancel any ongoing generation
+    if (generationAbortControllerRef.current) {
+      generationAbortControllerRef.current.abort();
+      generationAbortControllerRef.current = null;
+    }
+    cleanupAudio();
+    setCurrentPlayingPage(null);
+    setIsPaused(false);
+    setIsGenerating(false);
+    setGeneratingPage(null);
+    textChunksRef.current = [];
+    currentChunkIndexRef.current = 0;
+  };
+
+  /**
+   * Pauses current audio playback
+   */
+  const pauseAudio = () => {
+    if (audioRef.current && !audioRef.current.paused) {
+      audioRef.current.pause();
+      setIsPaused(true);
+    }
+  };
+
+  /**
+   * Resumes paused audio playback
+   */
+  const resumeAudio = () => {
+    if (audioRef.current && audioRef.current.paused) {
+      audioRef.current.play().catch((error) => {
+        console.error("Audio resume error:", error);
+        showError("Failed to resume audio playback");
+      });
+      setIsPaused(false);
+    }
+  };
+
+  /**
+   * Plays a single text chunk and handles continuation to next chunk
+   */
+  const playTextChunk = async (
+    pageIndex: number,
+    chunkIndex: number,
+    chunks: string[],
+    abortController: AbortController
+  ): Promise<void> => {
+    if (chunkIndex >= chunks.length) {
+      // All chunks played
+      setIsGenerating(false);
+      setGeneratingPage(null);
+      setCurrentPlayingPage(null);
+      setIsPaused(false);
+      generationAbortControllerRef.current = null;
+      textChunksRef.current = [];
+      currentChunkIndexRef.current = 0;
+      return;
+    }
+
+    if (abortController.signal.aborted) {
+      return;
+    }
+
+    const chunk = chunks[chunkIndex];
+    const isLastChunk = chunkIndex === chunks.length - 1;
+    currentChunkIndexRef.current = chunkIndex;
+
+    try {
+      const response = await textToSpeechService.generateSpeech({
+        text: chunk,
+        language: selectedTTSLanguage,
+      });
+
+      if (abortController.signal.aborted) {
+        return;
+      }
+
+      if (response.success && response.audio) {
+        // Set playing state on first chunk
+        if (chunkIndex === 0) {
+          setCurrentPlayingPage(pageIndex);
+          setIsPaused(false);
+        }
+
+        // Play the audio chunk
+        await playAudioFromBase64(response.audio, isLastChunk);
+
+        // If not aborted and not last chunk, play next chunk
+        if (!abortController.signal.aborted && !isLastChunk) {
+          await playTextChunk(pageIndex, chunkIndex + 1, chunks, abortController);
+        } else if (isLastChunk) {
+          // Last chunk finished
+          setIsGenerating(false);
+          setGeneratingPage(null);
+          generationAbortControllerRef.current = null;
+          textChunksRef.current = [];
+          currentChunkIndexRef.current = 0;
+        }
+      } else {
+        showError(
+          response.error || response.message || "Failed to generate speech"
+        );
+        setIsGenerating(false);
+        setGeneratingPage(null);
+        setCurrentPlayingPage(null);
+        generationAbortControllerRef.current = null;
+        textChunksRef.current = [];
+        currentChunkIndexRef.current = 0;
+      }
+    } catch (error) {
+      if (abortController.signal.aborted) {
+        return;
+      }
+      console.error("TTS error:", error);
+      showError("Failed to generate or play speech");
+      setIsGenerating(false);
+      setGeneratingPage(null);
+      setCurrentPlayingPage(null);
+      generationAbortControllerRef.current = null;
+      textChunksRef.current = [];
+      currentChunkIndexRef.current = 0;
+    }
+  };
+
+  const handlePlayPage = async (pageIndex: number) => {
+    if (!pageTexts[pageIndex]) return;
+
+    // Handle cancel generation if clicking the same page that's generating
+    if (generatingPage === pageIndex && isGenerating) {
+      cancelGeneration();
+      return;
+    }
+
+    // Handle play/pause if clicking the same page that's playing
+    if (currentPlayingPage === pageIndex && audioRef.current) {
+      if (audioRef.current.paused || isPaused) {
+        resumeAudio();
+      } else {
+        pauseAudio();
+      }
+      return;
+    }
+
+    // Stop any current audio/generation before starting new one
+    if (currentPlayingPage !== null || isGenerating) {
+      stopAudio();
+    }
+
+    // Validate page data before starting generation
+    const pageData = pageTexts[pageIndex];
+    if (!pageData?.text?.trim()) {
+      showError("No text content available for this page");
+      return;
+    }
+
+    // Split text into chunks if needed (4900 bytes limit)
+    const MAX_TEXT_SIZE = 4900;
+    const textChunks = splitTextIntoChunks(pageData.text, MAX_TEXT_SIZE);
+    textChunksRef.current = textChunks;
+    currentChunkIndexRef.current = 0;
+
+    // // If text was split, show info message
+    // if (textChunks.length > 1) {
+    //   showSuccess(`Text will be played in ${textChunks.length} parts`);
+    // }
+
+    setGeneratingPage(pageIndex);
+    setIsGenerating(true);
+
+    const abortController = new AbortController();
+    generationAbortControllerRef.current = abortController;
+
+    // Start playing chunks sequentially
+    await playTextChunk(pageIndex, 0, textChunks, abortController);
+  };
+
+  useEffect(() => {
+    return () => {
+      cleanupAudio();
+    };
+  }, []);
+
+  // Stop audio and cancel generation when chapter changes
+  useEffect(() => {
+    const stopAllAudio = () => {
+      if (generationAbortControllerRef.current) {
+        generationAbortControllerRef.current.abort();
+        generationAbortControllerRef.current = null;
+      }
+      cleanupAudio();
+      setIsGenerating(false);
+      setGeneratingPage(null);
+      setCurrentPlayingPage(null);
+      setIsPaused(false);
+    };
+
+    // Only stop if chapter actually changed (not on initial mount)
+    if (chapter?.chapter_id) {
+      stopAllAudio();
+    }
+  }, [chapter?.chapter_id]);
+
+  useEffect(() => {
+    if (!chapter || blocks.length === 0) return;
+
+    observerRef.current?.disconnect();
+
+    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+      const entry = entries.find((e) => e.isIntersecting);
+      if (!entry) return;
+
+      const blockId = entry.target.getAttribute("data-block-id");
+      if (!blockId) return;
+
+      const index = blocks.findIndex((b) => b.blockId === blockId);
+      if (index === -1) return;
+
+      const chapterProgress = index / blocks.length;
+      const globalProgress =
+        totalChapters > 0
+          ? ((chapterIndex + chapterProgress) / totalChapters) * 100
+          : 0;
+
+      if (progressUpdateTimeout.current) {
+        clearTimeout(progressUpdateTimeout.current);
+      }
+
+      progressUpdateTimeout.current = setTimeout(() => {
+        bookService.updateReadingProgress({
+          book_id: chapter.book_id,
+          chapter_id: chapter.chapter_id,
+          block_id: blockId,
+          progress_percentage: parseFloat(globalProgress.toFixed(2)),
+        });
+      }, 2000);
+    };
+
+    observerRef.current = new IntersectionObserver(handleIntersection, {
+      threshold: 0.5,
+    });
+
+    const timer = setTimeout(() => {
+      document
+        .querySelectorAll("[data-block-id]")
+        .forEach((el) => observerRef.current?.observe(el));
+    }, 500);
+
+    return () => {
+      observerRef.current?.disconnect();
+      progressUpdateTimeout.current &&
+        clearTimeout(progressUpdateTimeout.current);
+      clearTimeout(timer);
+    };
+  }, [chapter, blocks, chapterIndex, totalChapters]);
+
+  if (!chapter) {
+    return (
+      <ContentContainer>
+        <EmptyState>
+          <EmptyStateIcon>📖</EmptyStateIcon>
+          <EmptyStateText>{t('chapterSidebar.noChapterSelected')}</EmptyStateText>
+          <EmptyStateSubtext>
+            {t('chapterSidebar.selectChapterToBegin')}
+          </EmptyStateSubtext>
+        </EmptyState>
+      </ContentContainer>
+    );
+  }
+
+  if (isLoadingMetadata) {
+    return (
+      <ContentContainer>
+        <ChapterHeader>
+          <ChapterTitle>{chapter.title}</ChapterTitle>
+          {chapter.description && (
+            <ChapterDescription>{chapter.description}</ChapterDescription>
+          )}
+        </ChapterHeader>
+        <EmptyState>
+          <LoadingSpinner />
+          <EmptyStateText>Loading chapter content...</EmptyStateText>
+        </EmptyState>
+      </ContentContainer>
+    );
+  }
+
+  return (
+    <ContentContainer>
+      <ChapterHeader>
+        <ChapterTitle>{chapter.title}</ChapterTitle>
+        {chapter.description && (
+          <ChapterDescription>{chapter.description}</ChapterDescription>
+        )}
+        <ChapterMeta>
+          <MetaItem>{t('chapterSidebar.chapter')} {chapter.chapter_number}</MetaItem>
+          <MetaItem>
+            {new Date(chapter.created_at).toLocaleDateString()}
+          </MetaItem>
+        </ChapterMeta>
+        <HeaderActions>
+          {/* <LanguageDropdownContainer>
+            <LanguageLabel htmlFor="tts-language">TTS Language:</LanguageLabel>
+            <LanguageSelect
+              id="tts-language"
+              value={selectedTTSLanguage}
+              onChange={(e) => setSelectedTTSLanguage(e.target.value)}
+            >
+              {TTS_LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.name}
+                </option>
+              ))}
+            </LanguageSelect>
+          </LanguageDropdownContainer> */}
+          
+          <HighlightButton
+            $isActive={isHighlightMode}
+            onClick={() => setIsHighlightMode(!isHighlightMode)}
+            title={isHighlightMode ? "Disable highlight mode" : "Enable highlight mode"}
+          >
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+              />
+            </svg>
+            <span>{isHighlightMode ? "Highlighting" : "Highlight"}</span>
+          </HighlightButton>
+
+          {isHighlightMode && (
+            <ColorPickerContainer>
+              <ColorPickerLabel>Color:</ColorPickerLabel>
+              <ColorOptions>
+                <ColorOption
+                  $color="#FEF08A"
+                  $isSelected={selectedColor === "yellow"}
+                  onClick={() => setSelectedColor("yellow")}
+                  title="Yellow"
+                />
+                <ColorOption
+                  $color="#86EFAC"
+                  $isSelected={selectedColor === "green"}
+                  onClick={() => setSelectedColor("green")}
+                  title="Green"
+                />
+                <ColorOption
+                  $color="#93C5FD"
+                  $isSelected={selectedColor === "blue"}
+                  onClick={() => setSelectedColor("blue")}
+                  title="Blue"
+                />
+              </ColorOptions>
+            </ColorPickerContainer>
+          )}
+          
+          <BookmarkButton
+            $isBookmarked={isBookmarked}
+            onClick={handleBookmark}
+            disabled={isBookmarking}
+            title={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+          >
+            <BookMarkIcon 
+              fill={isBookmarked ? "white" : "#0860C4"} 
+              width={16} 
+              height={16} 
+            />
+            <span>
+              { 
+                isBookmarked ? "Bookmarked" : "Bookmark"
+              }
+            </span>
+          </BookmarkButton>
+
+          {categoryName === "Segregate Bibles" && (
+            <>
+              <LikeButton
+                $isLiked={isLiked}
+                onClick={handleLike}
+                disabled={isLiking}
+                title={(isLiked ? "Unlike chapter" : "Like chapter")}
+              >
+                {isLiked ? (
+                  <FaThumbsUp color="white" size={16} />
+                ) : (
+                  <AiOutlineLike color="#0860C4" size={16} />
+                )}
+                <span>{likeCount}</span>
+              </LikeButton>
+
+              <FeedbackButton
+                onClick={() => setIsFeedbackModalOpen(true)}
+                title="Provide feedback"
+              >
+                <MdFeedback color="#0860C4" size={16} />
+                <span>Feedback</span>
+              </FeedbackButton>
+            </>
+          )}
+        </HeaderActions>
+      </ChapterHeader>
+
+      {/* Text-to-Speech Controls */}
+      {/* {pageTexts.length > 0 && (
+        <TTSControlsContainer>
+          <TTSHeader>
+            <TTSTitle>Text-to-Speech</TTSTitle>
+            <SelectAllButton onClick={handleSelectAllPages}>
+              {selectedPages.size === pageTexts.length
+                ? "Deselect All"
+                : "Select All"}
+            </SelectAllButton>
+          </TTSHeader>
+          <PageSelector>
+            {pageTexts.map((pageData, index) => (
+              <PageCheckboxLabel key={index}>
+                <input
+                  type="checkbox"
+                  checked={selectedPages.has(index)}
+                  onChange={() => handlePageSelection(index)}
+                  disabled={isGenerating}
+                />
+                <span>Page {pageData.pageIndex}</span>
+              </PageCheckboxLabel>
+            ))}
+          </PageSelector>
+          <PlayButton
+            onClick={handlePlaySelectedPages}
+            disabled={isGenerating || selectedPages.size === 0}
+          >
+            {isGenerating && generatingPage === null ? (
+              <>
+                <LoadingSpinner />
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <span>Play Selected ({selectedPages.size})</span>
+              </>
+            )}
+          </PlayButton>
+        </TTSControlsContainer>
+      )} */}
+
+      {chapter.video_url && (
+        <VideoContainer>
+          <iframe
+            src={getYouTubeEmbedUrl(chapter.video_url)!}
+            title={chapter.title}
+            allowFullScreen
+          />
+        </VideoContainer>
+      )}
+
+      <PageWrapper>
+        <BlocksContainer ref={contentRef}>
+          {pages.map((page, pageIndex) => (
+            <PageContainer key={pageIndex} className="markdown-body">
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "12px",
+                  paddingBottom: "12px",
+                  borderBottom: "1px solid #e5e7eb",
+                }}
+              >
+                <span style={{ fontSize: "14px", color: "#6b7280" }}>
+                  Page {pageIndex + 1}
+                </span>
+                <PagePlayButton
+                  onClick={() => handlePlayPage(pageIndex)}
+                  disabled={isGenerating && generatingPage !== pageIndex}
+                  isPlaying={currentPlayingPage === pageIndex && !isPaused}
+                >
+                  {generatingPage === pageIndex ? (
+                    <>
+                      <LoadingSpinner />
+                      <span>Generating...</span>
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        style={{ marginLeft: "8px" }}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span style={{ marginLeft: "4px" }}>Cancel</span>
+                    </>
+                  ) : currentPlayingPage === pageIndex && !isPaused ? (
+                    <>
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>Pause</span>
+                    </>
+                  ) : currentPlayingPage === pageIndex && isPaused ? (
+                    <>
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>Resume</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>Play</span>
+                    </>
+                  )}
+                </PagePlayButton>
+              </div>
+              {page.map((block) => (
+                <BlockItem
+                  key={block.blockId}
+                  data-block-id={block.blockId}
+                  dangerouslySetInnerHTML={{ __html: block.html }}
+                />
+              ))}
+            </PageContainer>
+          ))}
+        </BlocksContainer>
+      </PageWrapper>
+
+      <ChapterFeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
+        chapterId={chapter.chapter_id}
+      />
+    </ContentContainer>
+  );
+};

@@ -1,0 +1,22 @@
+{
+  "welcome": "مرحباً",
+  "login": "تسجيل الدخول",
+  "signup": "إنشاء حساب",
+  "logout": "تسجيل الخروج",
+  "home": "الرئيسية",
+  "profile": "الملف الشخصي",
+  "settings": "الإعدادات",
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "delete": "حذف",
+  "edit": "تعديل",
+  "submit": "إرسال",
+  "loading": "جاري التحميل...",
+  "error": "خطأ",
+  "success": "نجح",
+  "linkCopied": "تم نسخ الرابط إلى الحافظة!",
+  "failedToCopy": "فشل نسخ الرابط",
+  "sharePost": "مشاركة المنشور",
+  "sharePrayerRequest": "مشاركة طلب الصلاة"
+}
+

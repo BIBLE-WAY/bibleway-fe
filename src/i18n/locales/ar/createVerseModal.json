@@ -1,0 +1,31 @@
+{
+  "title": "إنشاء اقتباس يومي",
+  "note": "ملاحظة: إنشاء آية جديدة سيمحو الاقتباس اليومي الموجود. لا يمكن التراجع عن هذا الإجراء. سيتم عرض الاقتباس الجديد لجميع المستخدمين فوراً.",
+  "labels": {
+    "title": "العنوان (اختياري)",
+    "quoteDescription": "الاقتباس / الوصف (مطلوب)"
+  },
+  "placeholders": {
+    "title": "مثال: اقتباس اليوم",
+    "quoteDescription": "أدخل النص المقدس أو الاقتباس هنا..."
+  },
+  "buttons": {
+    "cancel": "إلغاء",
+    "publishQuote": "نشر الاقتباس",
+    "publishing": "جاري النشر...",
+    "updateQuote": "تحديث الاقتباس",
+    "updating": "جاري التحديث..."
+  },
+  "errors": {
+    "descriptionRequired": "الوصف مطلوب",
+    "failedToCreateVerse": "فشل إنشاء الآية",
+    "failedToUpdateVerse": "فشل تحديث الآية",
+    "unexpectedError": "حدث خطأ غير متوقع"
+  },
+  "success": {
+    "verseCreated": "تم إنشاء الآية بنجاح",
+    "verseUpdated": "تم تحديث الآية بنجاح"
+  },
+  "editTitle": "تعديل الآية"
+}
+

@@ -1,0 +1,46 @@
+{
+  "title": "Boek Uploaden",
+  "labels": {
+    "sourceFile": "Bronbestand (.md) *",
+    "coverImage": "Omslagafbeelding",
+    "category": "Categorie *",
+    "ageGroup": "Leeftijdsgroep *",
+    "language": "Taal *",
+    "bookTitle": "Titel *",
+    "description": "Beschrijving",
+    "bookOrder": "Boek volgorde"
+  },
+  "placeholders": {
+    "selectCategory": "Selecteer een categorie",
+    "selectAgeGroup": "Selecteer een leeftijdsgroep",
+    "selectLanguage": "Selecteer een taal",
+    "enterBookTitle": "Voer de boektitel in",
+    "enterBookDescription": "Voer de boekbeschrijving in (optioneel)"
+  },
+  "loading": {
+    "categories": "Categorieën laden...",
+    "ageGroups": "Leeftijdsgroepen laden...",
+    "languages": "Talen laden...",
+    "uploading": "Uploaden..."
+  },
+  "selected": "Geselecteerd:",
+  "buttons": {
+    "cancel": "Annuleren",
+    "uploadBook": "Boek Uploaden"
+  },
+  "errors": {
+    "sourceFileRequired": "Bronbestand is verplicht",
+    "titleRequired": "Titel is verplicht",
+    "categoryRequired": "Categorie is verplicht",
+    "ageGroupRequired": "Leeftijdsgroep is verplicht",
+    "languageRequired": "Taal is verplicht",
+    "failedToLoadCategories": "Laden van categorieën mislukt",
+    "failedToLoadAgeGroups": "Laden van leeftijdsgroepen mislukt",
+    "failedToLoadLanguages": "Laden van talen mislukt",
+    "failedToUploadBook": "Uploaden van boek mislukt",
+    "unexpectedError": "Er is een onverwachte fout opgetreden"
+  },
+  "success": {
+    "bookCreated": "Boek succesvol aangemaakt"
+  }
+}

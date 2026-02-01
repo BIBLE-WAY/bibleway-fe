@@ -1,0 +1,27 @@
+{
+  "title": "Utwórz kategorię",
+  "labels": {
+    "categoryName": "Nazwa kategorii *",
+    "description": "Opis",
+    "displayOrder": "Kolejność wyświetlania",
+    "coverImage": "Obraz okładki"
+  },
+  "placeholders": {
+    "selectCategoryName": "Wybierz nazwę kategorii",
+    "enterDescription": "Wprowadź opis kategorii (opcjonalnie)"
+  },
+  "selected": "Wybrano:",
+  "buttons": {
+    "cancel": "Anuluj",
+    "createCategory": "Utwórz kategorię",
+    "creating": "Tworzenie..."
+  },
+  "errors": {
+    "categoryNameRequired": "Nazwa kategorii jest wymagana",
+    "failedToCreateCategory": "Nie udało się utworzyć kategorii",
+    "unexpectedError": "Wystąpił nieoczekiwany błąd"
+  },
+  "success": {
+    "categoryCreated": "Kategoria utworzona pomyślnie"
+  }
+}

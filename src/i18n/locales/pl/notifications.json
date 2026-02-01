@@ -1,0 +1,18 @@
+{
+  "title": "Powiadomienia",
+  "markAllAsRead": "Oznacz wszystkie jako przeczytane",
+  "loading": "Ładowanie powiadomień...",
+  "noNotifications": "Brak powiadomień",
+  "allCaughtUp": "Wszystko zaznaczone!",
+  "justNow": "Przed chwilą",
+  "minuteAgo": "{{count}} minutę temu",
+  "minutesAgo": "{{count}} minut temu",
+  "hourAgo": "{{count}} godzinę temu",
+  "hoursAgo": "{{count}} godzin temu",
+  "dayAgo": "{{count}} dzień temu",
+  "daysAgo": "{{count}} dni temu",
+  "weekAgo": "{{count}} tydzień temu",
+  "weeksAgo": "{{count}} tygodni temu",
+  "monthAgo": "{{count}} miesiąc temu",
+  "monthsAgo": "{{count}} miesięcy temu"
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Quote of the day",
+  "loading": "Loading...",
+  "likes": "Likes",
+  "addNewPost": "Add New Post",
+  "failedToUpdateLike": "Failed to update like",
+  "pleaseUpload": "No quote of the day uploaded yet"
+}
+

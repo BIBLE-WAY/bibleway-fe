@@ -1,0 +1,46 @@
+{
+  "title": "Prześlij książkę",
+  "labels": {
+    "sourceFile": "Plik źródłowy (.md) *",
+    "coverImage": "Obraz okładki",
+    "category": "Kategoria *",
+    "ageGroup": "Grupa wiekowa *",
+    "language": "Język *",
+    "bookTitle": "Tytuł *",
+    "description": "Opis",
+    "bookOrder": "Kolejność książki"
+  },
+  "placeholders": {
+    "selectCategory": "Wybierz kategorię",
+    "selectAgeGroup": "Wybierz grupę wiekową",
+    "selectLanguage": "Wybierz język",
+    "enterBookTitle": "Wprowadź tytuł książki",
+    "enterBookDescription": "Wprowadź opis książki (opcjonalnie)"
+  },
+  "loading": {
+    "categories": "Ładowanie kategorii...",
+    "ageGroups": "Ładowanie grup wiekowych...",
+    "languages": "Ładowanie języków...",
+    "uploading": "Przesyłanie..."
+  },
+  "selected": "Wybrano:",
+  "buttons": {
+    "cancel": "Anuluj",
+    "uploadBook": "Prześlij książkę"
+  },
+  "errors": {
+    "sourceFileRequired": "Plik źródłowy jest wymagany",
+    "titleRequired": "Tytuł jest wymagany",
+    "categoryRequired": "Kategoria jest wymagana",
+    "ageGroupRequired": "Grupa wiekowa jest wymagana",
+    "languageRequired": "Język jest wymagany",
+    "failedToLoadCategories": "Nie udało się załadować kategorii",
+    "failedToLoadAgeGroups": "Nie udało się załadować grup wiekowych",
+    "failedToLoadLanguages": "Nie udało się załadować języków",
+    "failedToUploadBook": "Nie udało się przesłać książki",
+    "unexpectedError": "Wystąpił nieoczekiwany błąd"
+  },
+  "success": {
+    "bookCreated": "Książka utworzona pomyślnie"
+  }
+}

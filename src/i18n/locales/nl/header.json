@@ -1,0 +1,13 @@
+{
+  "searchPlaceholder": "Zoek boek, naam, auteur...",
+  "addNewPost": "Nieuw Bericht Toevoegen",
+  "noResultsFound": "Geen resultaten gevonden",
+  "languageSelector": {
+    "searchLanguages": "Zoek talen...",
+    "noLanguagesFound": "Geen talen gevonden"
+  },
+  "filter": {
+    "selectLanguage": "Selecteer Taal",
+    "selectVersion": "Selecteer Boek"
+  }
+}

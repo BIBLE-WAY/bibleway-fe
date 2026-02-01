@@ -1,0 +1,15 @@
+{
+  "searchPeople": "Szukaj ludzi",
+  "searchPeoplePlaceholder": "Szukaj ludzi...",
+  "searching": "Wyszukiwanie...",
+  "noUsersFound": "Nie znaleziono użytkowników",
+  "follow": "Obserwuj",
+  "following": "Obserwowani",
+  "failedToUpdateFollowStatus": "Nie udało się zaktualizować statusu obserwowania",
+  "loadingInbox": "Ładowanie skrzynki odbiorczej...",
+  "noMessages": "Brak wiadomości",
+  "you": "Ty: ",
+  "attachment": "Załącznik",
+  "noMessagesText": "Brak wiadomości",
+  "sticker": "📷 Naklejka"
+}

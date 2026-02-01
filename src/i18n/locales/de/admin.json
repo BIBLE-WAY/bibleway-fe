@@ -1,0 +1,38 @@
+{
+  "loading": "Laden...",
+  "error": {
+    "mustBeInProfileProvider": "AdminProtectedRoute muss innerhalb eines ProfileProvider verwendet werden"
+  },
+  "testimonials": {
+    "title": "Verwaltung von Erfahrungsberichten",
+    "pending": "Ausstehend",
+    "verified": "Verifiziert",
+    "all": "Alle",
+    "loading": "Lade Erfahrungsberichte...",
+    "noTestimonials": "Keine Erfahrungsberichte gefunden",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "processing": "Verarbeitung...",
+    "approvedSuccessfully": "Erfahrungsbericht erfolgreich genehmigt",
+    "rejectedSuccessfully": "Erfahrungsbericht erfolgreich abgelehnt",
+    "failedToLoad": "Erfahrungsberichte konnten nicht geladen werden",
+    "failedToApprove": "Erfahrungsbericht konnte nicht genehmigt werden",
+    "failedToReject": "Erfahrungsbericht konnte nicht abgelehnt werden",
+    "confirmReject": "Sind Sie sicher, dass Sie diesen Erfahrungsbericht ablehnen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "pageInfo": "Seite {{current}} von {{total}}"
+  },
+  "promotions": {
+    "title": "Werbeverwaltung",
+    "loading": "Lade Werbeaktionen...",
+    "noPromotions": "Keine Werbeaktionen gefunden",
+    "delete": "Löschen",
+    "cancel": "Abbrechen",
+    "processing": "Verarbeitung...",
+    "deletedSuccessfully": "Werbeaktion erfolgreich gelöscht",
+    "failedToLoad": "Werbeaktionen konnten nicht geladen werden",
+    "failedToDelete": "Werbeaktion konnte nicht gelöscht werden",
+    "confirmDelete": "Sind Sie sicher, dass Sie diese Werbeaktion löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+  }
+}

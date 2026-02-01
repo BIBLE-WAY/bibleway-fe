@@ -1,0 +1,21 @@
+{
+  "welcome": "Willkommen",
+  "login": "Anmelden",
+  "signup": "Registrieren",
+  "logout": "Abmelden",
+  "home": "Startseite",
+  "profile": "Profil",
+  "settings": "Einstellungen",
+  "save": "Speichern",
+  "cancel": "Abbrechen",
+  "delete": "Löschen",
+  "edit": "Bearbeiten",
+  "submit": "Absenden",
+  "loading": "Laden...",
+  "error": "Fehler",
+  "success": "Erfolg",
+  "linkCopied": "Link in die Zwischenablage kopiert!",
+  "failedToCopy": "Link konnte nicht kopiert werden",
+  "sharePost": "Beitrag teilen",
+  "sharePrayerRequest": "Gebetsanliegen teilen"
+}

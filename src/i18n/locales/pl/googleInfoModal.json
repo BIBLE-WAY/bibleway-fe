@@ -1,0 +1,19 @@
+{
+  "title": "Uzupełnij rejestrację",
+  "description": "Potrzebujemy jeszcze kilku szczegółów, aby dokończyć tworzenie konta.",
+  "labels": {
+    "age": "Wiek",
+    "language": "Język",
+    "country": "Kraj"
+  },
+  "placeholders": {
+    "age": "np. 25",
+    "language": "np. Polski",
+    "country": "np. Polska"
+  },
+  "buttons": {
+    "cancel": "Anuluj",
+    "continue": "Kontynuuj",
+    "creating": "Tworzenie..."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "title": "Zitat des Tages",
+  "loading": "Laden...",
+  "likes": "Gefällt mir",
+  "addNewPost": "Neuen Beitrag hinzufügen",
+  "failedToUpdateLike": "Gefällt mir Status konnte nicht aktualisiert werden",
+  "pleaseUpload": "Noch kein Zitat des Tages hochgeladen"
+}

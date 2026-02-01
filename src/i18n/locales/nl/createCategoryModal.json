@@ -1,0 +1,27 @@
+{
+  "title": "Categorie Aanmaken",
+  "labels": {
+    "categoryName": "Categorienaam *",
+    "description": "Beschrijving",
+    "displayOrder": "Weergavevolgorde",
+    "coverImage": "Omslagafbeelding"
+  },
+  "placeholders": {
+    "selectCategoryName": "Selecteer een categorienaam",
+    "enterDescription": "Voer de categoriebeschrijving in (optioneel)"
+  },
+  "selected": "Geselecteerd:",
+  "buttons": {
+    "cancel": "Annuleren",
+    "createCategory": "Categorie Aanmaken",
+    "creating": "Aanmaken..."
+  },
+  "errors": {
+    "categoryNameRequired": "Categorienaam is verplicht",
+    "failedToCreateCategory": "Aanmaken van categorie mislukt",
+    "unexpectedError": "Er is een onverwachte fout opgetreden"
+  },
+  "success": {
+    "categoryCreated": "Categorie succesvol aangemaakt"
+  }
+}

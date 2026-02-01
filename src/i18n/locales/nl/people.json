@@ -1,0 +1,15 @@
+{
+  "searchPeople": "Personen Zoeken",
+  "searchPeoplePlaceholder": "Zoek personen...",
+  "searching": "Zoeken...",
+  "noUsersFound": "Geen gebruikers gevonden",
+  "follow": "Volgen",
+  "following": "Volgend",
+  "failedToUpdateFollowStatus": "Bijwerken van volgstatus mislukt",
+  "loadingInbox": "Inbox laden...",
+  "noMessages": "Geen berichten",
+  "you": "Jij: ",
+  "attachment": "Bijlage",
+  "noMessagesText": "Geen berichten",
+  "sticker": "📷 Sticker"
+}

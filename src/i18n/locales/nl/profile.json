@@ -1,0 +1,19 @@
+{
+  "back": "Terug",
+  "follow": "Volgen",
+  "unfollow": "Ontvolgen",
+  "message": "Bericht",
+  "follower": "Volger",
+  "following": "Volgend",
+  "followers": "Volgers",
+  "loadingProfile": "Profiel laden...",
+  "profileNotFound": "Profiel niet gevonden",
+  "loadingPosts": "Berichten laden...",
+  "noPostsYet": "Nog geen berichten",
+  "unknownUser": "Onbekende Gebruiker",
+  "checkOutProfile": "Bekijk het profiel van {{name}} op BibleWay",
+  "profileTitle": "Profiel van {{name}}",
+  "unfollowedSuccessfully": "Succesvol ontvolgd",
+  "followedSuccessfully": "Succesvol gevolgd",
+  "failedToFetchUserPosts": "Ophalen van gebruikersberichten mislukt"
+}

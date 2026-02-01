@@ -1,0 +1,38 @@
+{
+  "title": "Utwórz promocję",
+  "labels": {
+    "title": "Tytuł *",
+    "description": "Opis",
+    "price": "Cena",
+    "redirectLink": "Link przekierowania *",
+    "metaData": "Meta dane (JSON)",
+    "mediaFile": "Plik multimedialny (obraz/wideo/audio)",
+    "images": "Obrazy (wiele)"
+  },
+  "placeholders": {
+    "enterPromotionTitle": "Wprowadź tytuł promocji",
+    "enterDescription": "Wprowadź opis promocji (opcjonalnie)",
+    "price": "0.00",
+    "redirectLink": "https://example.com",
+    "metaData": "{\"key\": \"value\"}"
+  },
+  "selected": "Wybrano:",
+  "buttons": {
+    "cancel": "Anuluj",
+    "createPromotion": "Utwórz promocję",
+    "creating": "Tworzenie..."
+  },
+  "errors": {
+    "titleRequired": "Tytuł jest wymagany",
+    "priceRequired": "Cena jest wymagana",
+    "priceInvalid": "Cena musi być prawidłową liczbą",
+    "redirectLinkRequired": "Link przekierowania jest wymagany",
+    "redirectLinkInvalid": "Link przekierowania musi być prawidłowym adresem URL",
+    "metaDataInvalid": "Meta dane muszą być w prawidłowym formacie JSON",
+    "failedToCreatePromotion": "Nie udało się utworzyć promocji",
+    "unexpectedError": "Wystąpił nieoczekiwany błąd"
+  },
+  "success": {
+    "promotionCreated": "Promocja utworzona pomyślnie"
+  }
+}

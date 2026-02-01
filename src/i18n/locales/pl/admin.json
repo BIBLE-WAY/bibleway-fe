@@ -1,0 +1,38 @@
+{
+  "loading": "Ładowanie...",
+  "error": {
+    "mustBeInProfileProvider": "AdminProtectedRoute musi być używany w ProfileProvider"
+  },
+  "testimonials": {
+    "title": "Zarządzanie referencjami",
+    "pending": "Oczekujące",
+    "verified": "Zweryfikowane",
+    "all": "Wszystkie",
+    "loading": "Ładowanie referencji...",
+    "noTestimonials": "Nie znaleziono referencji",
+    "approve": "Zatwierdź",
+    "reject": "Odrzuć",
+    "processing": "Przetwarzanie...",
+    "approvedSuccessfully": "Referencja zatwierdzona pomyślnie",
+    "rejectedSuccessfully": "Referencja odrzucona pomyślnie",
+    "failedToLoad": "Nie udało się załadować referencji",
+    "failedToApprove": "Nie udało się zatwierdzić referencji",
+    "failedToReject": "Nie udało się odrzucić referencji",
+    "confirmReject": "Czy na pewno chcesz odrzucić tę referencję? Tej akcji nie można cofnąć.",
+    "previous": "Poprzednia",
+    "next": "Następna",
+    "pageInfo": "Strona {{current}} z {{total}}"
+  },
+  "promotions": {
+    "title": "Zarządzanie promocjami",
+    "loading": "Ładowanie promocji...",
+    "noPromotions": "Nie znaleziono promocji",
+    "delete": "Usuń",
+    "cancel": "Anuluj",
+    "processing": "Przetwarzanie...",
+    "deletedSuccessfully": "Promocja usunięta pomyślnie",
+    "failedToLoad": "Nie udało się załadować promocji",
+    "failedToDelete": "Nie udało się usunąć promocji",
+    "confirmDelete": "Czy na pewno chcesz usunąć tę promocję? Tej akcji nie można cofnąć."
+  }
+}

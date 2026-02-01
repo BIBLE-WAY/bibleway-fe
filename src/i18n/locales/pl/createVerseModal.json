@@ -1,0 +1,30 @@
+{
+  "title": "Utwórz codzienny cytat",
+  "note": "Uwaga: Utworzenie nowego wersetu wyczyści istniejący codzienny cytat. Tej akcji nie można cofnąć. Nowy cytat będzie wyświetlany wszystkim użytkownikom natychmiast.",
+  "labels": {
+    "title": "Tytuł (opcjonalnie)",
+    "quoteDescription": "Cytat / Opis (wymagane)"
+  },
+  "placeholders": {
+    "title": "np. Cytat dnia",
+    "quoteDescription": "Wprowadź pismo lub cytat tutaj..."
+  },
+  "buttons": {
+    "cancel": "Anuluj",
+    "publishQuote": "Opublikuj cytat",
+    "publishing": "Publikowanie...",
+    "updateQuote": "Zaktualizuj cytat",
+    "updating": "Aktualizowanie..."
+  },
+  "errors": {
+    "descriptionRequired": "Opis jest wymagany",
+    "failedToCreateVerse": "Nie udało się utworzyć wersetu",
+    "failedToUpdateVerse": "Nie udało się zaktualizować wersetu",
+    "unexpectedError": "Wystąpił nieoczekiwany błąd"
+  },
+  "success": {
+    "verseCreated": "Werset utworzony pomyślnie",
+    "verseUpdated": "Werset zaktualizowany pomyślnie"
+  },
+  "editTitle": "Edytuj werset"
+}
