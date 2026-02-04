@@ -28,7 +28,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return;
     }
 
-    const wsUrl = `${WS_URL}/ws/user/?token=${token}`;
+    const wsUrl = `${WS_URL}/ws/notifications/?token=${token}`;
     retryAttemptRef.current = 0;
 
     const attemptConnection = () => {

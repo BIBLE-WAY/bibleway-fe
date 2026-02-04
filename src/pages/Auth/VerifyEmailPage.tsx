@@ -2,10 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { authService } from '../../services/auth/auth.service';
 import { showError, showSuccess } from '../../utils/toast';
-import imgBwLogo1 from '../../components/loginpageComponent/Create Responsive UI/src/assets/82047ace63f043a9c60ca2a632bb00501ce9a8b9.png';
-import imgAroundTheWorldInEightyDays from '../../components/loginpageComponent/Create Responsive UI/src/assets/9aaae29b6c07406edb1f6a65e4a6657422706cc6.png';
-import imgTheWindInTheWillows from '../../components/loginpageComponent/Create Responsive UI/src/assets/aafc66062aa03a5ed3e5308bc867816729d83e4d.png';
-import imgLesMiserables from '../../components/loginpageComponent/Create Responsive UI/src/assets/8f6ffdd24b559646ed4084463db4215720009996.png';
 import {
   VerifyEmailContainer,
   BackgroundContainer,
@@ -203,27 +199,6 @@ const VerifyEmailPage: React.FC = () => {
     <VerifyEmailContainer>
       {/* Background with books - hidden on mobile, visible on larger screens */}
       <BackgroundContainer>
-        <Book1>
-          <img 
-            alt="Around the World in Eighty Days" 
-            src={imgAroundTheWorldInEightyDays}
-          />
-        </Book1>
-
-        <Book2>
-          <img 
-            alt="The Wind in the Willows" 
-            src={imgTheWindInTheWillows}
-          />
-        </Book2>
-
-        <Book3>
-          <img 
-            alt="Les Misérables" 
-            src={imgLesMiserables}
-          />
-        </Book3>
-
         <CurvedBackground>
           <svg className="w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 1686 1120">
             <g filter="url(#filter0_d_1_192)">

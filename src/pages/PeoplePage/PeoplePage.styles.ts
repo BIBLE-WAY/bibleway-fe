@@ -1,6 +1,4 @@
 import styled from "styled-components";
-import { HEADER_HEIGHT } from "../../constants/UI";
-import { MOBILE_NAVBAR_HEIGHT } from "../../constants/UI";
 
 export const PageContainer = styled.div`
   display: flex;
@@ -53,16 +51,11 @@ export const PeopleSearchWrapper = styled.div<{ $shouldShow: boolean }>`
   }
 `;
 
-export const ChatOrProfileWrapper = styled.div`
+export const ProfileWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
   flex: 1;
   height: 100%;
   overflow: hidden;
-`;
-
-export const ChatViewWrapper = styled.div`
-  width: 100%;
-  height: 100%;
 `;

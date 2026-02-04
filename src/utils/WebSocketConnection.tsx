@@ -8,7 +8,8 @@ const WebSocketConnection: React.FC = () => {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const WS_URL = 'ws://192.168.1.12:8000/ws/user/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1ODg3NzMyLCJpYXQiOjE3NjU4ODQxMzIsImp0aSI6IjFiMGY5OGY1N2E1MTQxMTc5NjFlNmRhMGU3NDNkOWY1IiwidXNlcl9pZCI6ImMwMmIxMmUxLTJlMGMtNGIzZi04MWExLTJmNGFmZmRmODg1YyIsImVtYWlsIjoibWFub2pAZ21haWwuY29tIiwidXNlcl9uYW1lIjoiTWFub2pWYWtpdGkiLCJpc19zdGFmZiI6ZmFsc2UsImlzX3N1cGVydXNlciI6ZmFsc2V9.4tizZV-voxU-ws1silffBHi_auftwHRbmOs3wSy54o4';
+  const token = localStorage.getItem('access_token') || '';
+  const WS_URL = `ws://localhost:8000/ws/notifications/?token=${token}`;
 
   const connectWebSocket = () => {
     try {

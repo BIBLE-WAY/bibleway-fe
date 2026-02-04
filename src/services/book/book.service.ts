@@ -1,6 +1,6 @@
 import api from '../../AxiosClient';
 import type { ApiError } from '../../constants/Error';
-import { GET_BOOKS, GET_BOOK_CHAPTERS, GET_CHAPTER_METADATA, CREATE_READING_PROGRESS, GET_TOP_BOOKS, GET_LATEST_CHAPTERS_BY_AGE_GROUP, LIKE_CHAPTER, UNLIKE_CHAPTER, CREATE_CHAPTER_FEEDBACK } from '../../constants/ApiUrls';
+import { GET_BOOKS, GET_BOOK_CHAPTERS, GET_CHAPTER_METADATA, CREATE_READING_PROGRESS, GET_READING_PROGRESS, GET_TOP_BOOKS, GET_LATEST_CHAPTERS_BY_AGE_GROUP, LIKE_CHAPTER, UNLIKE_CHAPTER, CREATE_CHAPTER_FEEDBACK } from '../../constants/ApiUrls';
 import type { AxiosError } from 'axios';
 
 export interface Book {
@@ -268,30 +268,20 @@ export const bookService = {
   getReadingProgress: async (
     bookId: string
   ): Promise<GetReadingProgressResponse> => {
-    // Dummy implementation
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Return null or mock data to test resume
-        resolve({
-          success: true,
-          data: null, // Change this to test resume functionality
-          // data: {
-          //   book_id: bookId,
-          //   chapter_id: "some-chapter-id", 
-          //   block_id: "some-block-id",
-          //   percentage: 10,
-          //   updated_at: new Date().toISOString()
-          // }
-        });
-      }, 500);
-    });
-    /*
-    // Real implementation:
     try {
-      const response = await api.get(`/books/${bookId}/progress`);
+      const response = await api.post<GetReadingProgressResponse>(
+        GET_READING_PROGRESS,
+        { book_id: bookId }
+      );
       return response.data;
-    } catch (error) { ... }
-    */
+    } catch (error) {
+      console.error('Failed to get reading progress:', error);
+      return {
+        success: false,
+        data: null,
+        error: 'Failed to get reading progress'
+      };
+    }
   },
 
   getTopBooks: async (): Promise<GetTopBooksResponse> => {

@@ -6,26 +6,22 @@ import {
   SearchIcon,
   SearchInput,
   PeopleList,
-  InboxContainer
 } from './PeopleSearchSidebar.styles';
 import { userService, type UserProfile } from '../../services/user/user.service';
 import PeopleListItem from './PeopleListItem';
-import InboxComponent from './InboxComponent';
 import { showError } from '../../utils/toast';
 import { useI18n } from '../../i18n';
 
 interface PeopleSearchSidebarProps {
-  onPersonSelect: (personId: string, conversationId: string, personName: string) => void;
+  onPersonSelect: (personId: string) => void;
   selectedPersonId?: string;
-  onViewChange: (view: 'profile' | 'chat' | 'peopleSearch') => void;
-  changePerson: (person: any) => void;
+  onViewChange: (view: 'profile' | 'peopleSearch') => void;
 }
 
 const PeopleSearchSidebar: React.FC<PeopleSearchSidebarProps> = ({
   onPersonSelect,
   selectedPersonId,
   onViewChange,
-  changePerson
 }) => {
   const { t } = useI18n();
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,7 +33,7 @@ const PeopleSearchSidebar: React.FC<PeopleSearchSidebarProps> = ({
     const response = await userService.searchUsers(query, 20);
     if (response.success) {
       setPeople(response.data);
-    }else{
+    } else {
       showError(response.message);
     }
     setLoading(false);
@@ -57,9 +53,9 @@ const PeopleSearchSidebar: React.FC<PeopleSearchSidebarProps> = ({
     };
   }, [searchQuery]);
 
-  const handlePersonClick = (personId: string, conversationId: string, personName: string) => {
+  const handlePersonClick = (personId: string) => {
     if (onPersonSelect) {
-      onPersonSelect(personId, conversationId, personName);
+      onPersonSelect(personId);
     }
   };
 
@@ -82,9 +78,13 @@ const PeopleSearchSidebar: React.FC<PeopleSearchSidebarProps> = ({
       </SearchWrapper>
       <PeopleList>
         {loading && <div style={{ padding: '10px', textAlign: 'center', color: '#6B7280' }}>{t('people.searching')}</div>}
-        
+
         {!loading && people.length === 0 && searchQuery.length >= 2 && (
-             <div style={{ padding: '10px', textAlign: 'center', color: '#6B7280' }}>{t('people.noUsersFound')}</div>
+          <div style={{ padding: '10px', textAlign: 'center', color: '#6B7280' }}>{t('people.noUsersFound')}</div>
+        )}
+
+        {!loading && searchQuery.length < 2 && (
+          <div style={{ padding: '10px', textAlign: 'center', color: '#6B7280' }}>{t('people.searchPrompt')}</div>
         )}
 
         {people.map((person) => (
@@ -93,21 +93,12 @@ const PeopleSearchSidebar: React.FC<PeopleSearchSidebarProps> = ({
             person={person}
             isSelected={selectedPersonId === person.user_id}
             onSelect={handlePersonClick}
-            onChatClick={(personId, conversationId, personName) => {
-               if (onPersonSelect) {onPersonSelect(personId, conversationId, personName);};
-            }}
             onViewChange={onViewChange}
-            changePerson={changePerson}
           />
         ))}
-
-        {searchQuery.length < 2 && (
-          <InboxContainer>
-            <InboxComponent onPersonSelect={onPersonSelect} changePerson={changePerson} />
-          </InboxContainer>
-        )}
       </PeopleList>
     </SidebarContainer>
   );
 };
+
 export default PeopleSearchSidebar;

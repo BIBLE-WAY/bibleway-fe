@@ -5,32 +5,27 @@ import {
   PersonInfo,
   PersonName,
   StatusBadge,
-  MessageIconWrapper
 } from './PeopleSearchSidebar.styles';
 import { userService, type UserProfile } from '../../services/user/user.service';
 import { showError } from '../../utils/toast';
-import { FaRegMessage } from "react-icons/fa6";
 import { useI18n } from '../../i18n';
 
 interface PeopleListItemProps {
   person: UserProfile;
   isSelected: boolean;
-  onSelect: (personId: string, conversationId: string, personName: string) => void;
-  onChatClick?: (personId: string, conversationId: string, personName: string) => void;
-  onViewChange: (view: 'profile' | 'chat' | 'peopleSearch') => void;
-  changePerson: (person: any) => void;
+  onSelect: (personId: string) => void;
+  onViewChange: (view: 'profile' | 'peopleSearch') => void;
 }
 
 const PeopleListItem: React.FC<PeopleListItemProps> = ({
   person,
   isSelected,
   onSelect,
-  onChatClick,
   onViewChange,
-  changePerson
 }) => {
   const { t } = useI18n();
   const [isFollowing, setIsFollowing] = useState(person.is_following);
+
   const getInitials = (name: string) => {
     return name ? name.charAt(0).toUpperCase() : '?';
   };
@@ -61,36 +56,28 @@ const PeopleListItem: React.FC<PeopleListItemProps> = ({
     <PersonCard
       $isSelected={isSelected}
       onClick={() => {
-        onSelect(person.user_id, person.conversation_id || '', person.user_name);
+        onSelect(person.user_id);
         onViewChange('profile');
       }}
     >
       <PersonAvatar $bgColor={person.profile_picture_url ? 'transparent' : '#6B7280'}>
         {person.profile_picture_url ? (
-            <img src={person.profile_picture_url} alt={person.user_name} style={{width: '100%', height: '100%', borderRadius: '100%', objectFit: 'cover'}} />
+          <img src={person.profile_picture_url} alt={person.user_name} style={{ width: '100%', height: '100%', borderRadius: '100%', objectFit: 'cover' }} />
         ) : (
-            getInitials(person.user_name)
+          getInitials(person.user_name)
         )}
       </PersonAvatar>
       <PersonInfo>
         <PersonName>{person.user_name}</PersonName>
       </PersonInfo>
-      <StatusBadge 
-          $isOnline={false} 
-          as="button"
-          onClick={handleFollowToggle}
-          style={{ cursor: 'pointer', border: 'none', opacity: 1 }}
+      <StatusBadge
+        $isOnline={false}
+        as="button"
+        onClick={handleFollowToggle}
+        style={{ cursor: 'pointer', border: 'none', opacity: 1 }}
       >
         {isFollowing ? t('people.following') : t('people.follow')}
       </StatusBadge>
-      <MessageIconWrapper>
-      <FaRegMessage fill='black' onClick={(e) => {
-        e.stopPropagation();
-        if (onChatClick) onChatClick(person.user_id, person.conversation_id || '', person.user_name);
-        changePerson(person);
-        onViewChange('chat');
-      }}/>
-      </MessageIconWrapper>
     </PersonCard>
   );
 };

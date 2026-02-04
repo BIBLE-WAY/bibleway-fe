@@ -57,17 +57,12 @@ export const SearchInput = styled.input`
   }
 `;
 
-export const InboxContainer = styled.div`
-  padding: 16px;
-`;
-
 export const PeopleList = styled.div`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;
 
-  /* Custom scrollbar */
   &::-webkit-scrollbar {
     width: 6px;
   }
@@ -85,7 +80,6 @@ export const PeopleList = styled.div`
     }
   }
 
-  /* Firefox Scrollbar */
   scrollbar-width: thin;
   scrollbar-color: #d1d5db transparent;
 
@@ -102,8 +96,7 @@ export const PersonCard = styled.div<{ $isSelected?: boolean }>`
   border-bottom: 1px solid #f3f4f6;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  background-color: ${(props) =>
-    props.$isSelected ? "#C7C7CC" : "transparent"};
+  background-color: ${(props) => (props.$isSelected ? "#C7C7CC" : "transparent")};
 
   &:last-child {
     border-bottom: none;
@@ -115,8 +108,7 @@ export const PersonAvatar = styled.div<{ $bgColor: string }>`
   height: 28px;
   border-radius: 50%;
   background-color: ${(props) => props.$bgColor};
-  background-image: ${(props) =>
-    props.$bgColor.startsWith("http") ? `url(${props.$bgColor})` : "none"};
+  background-image: ${(props) => (props.$bgColor.startsWith("http") ? `url(${props.$bgColor})` : "none")};
   background-size: cover;
   background-position: center;
   display: flex;
@@ -138,17 +130,7 @@ export const PersonName = styled.div`
   font-weight: 500;
   color: #1a1a1a;
   white-space: nowrap;
-
   text-overflow: ellipsis;
-`;
-
-export const MessageIconWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
 `;
 
 export const StatusBadge = styled.div<{ $isOnline: boolean }>`
