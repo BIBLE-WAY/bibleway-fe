@@ -9,7 +9,9 @@ const WebSocketConnection: React.FC = () => {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const token = localStorage.getItem('access_token') || '';
-  const WS_URL = `ws://localhost:8000/ws/notifications/?token=${token}`;
+  const WS_PROTOCOL = import.meta.env.VITE_WS_PROTOCOL || 'ws';
+  const API_URL = import.meta.env.VITE_API_URL || 'localhost:8000';
+  const WS_URL = `${WS_PROTOCOL}://${API_URL}/ws/notifications/?token=${token}`;
 
   const connectWebSocket = () => {
     try {
