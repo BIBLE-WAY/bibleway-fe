@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { Button } from "./ui/button";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
@@ -76,10 +77,11 @@ export function Header({ onSignIn, onSignUp }: HeaderProps) {
         </div>
       </header>
 
-      {/* Hero Image Modal */}
-      {showHeroModal && (
+      {/* Hero Image Modal - rendered via portal to ensure it's above everything */}
+      {showHeroModal && createPortal(
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          className="fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          style={{ zIndex: 99999 }}
           onClick={closeModal}
         >
           <div
@@ -99,7 +101,8 @@ export function Header({ onSignIn, onSignUp }: HeaderProps) {
               className="w-full h-auto rounded-2xl shadow-2xl"
             />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
