@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Header } from "./components/Header";
 import { WhiteHero } from "./components/WhiteHero";
@@ -13,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./com
 import { Separator } from "./components/ui/separator";
 import { ImageWithFallback } from "./components/figma/ImageWithFallback";
 import { toast } from "sonner";
+import { X } from "lucide-react";
 import {
   BookOpen,
   Headphones,
@@ -44,20 +46,26 @@ export default function LandingPage() {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [featureModalOpen, setFeatureModalOpen] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState<any>(null);
+  const [showHeroModal, setShowHeroModal] = useState(false);
 
-  const handleSignIn = () => {
-    navigate("/login");
-    console.log("Analytics: event.header.signin_click", { location: "header" });
-  };
+  const closeHeroModal = useCallback(() => setShowHeroModal(false), []);
 
-  const handleSignUp = () => {
-    navigate("/signup");
-    console.log("Analytics: event.header.signup_click", { location: "header" });
-  };
+  useEffect(() => {
+    if (!showHeroModal) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeHeroModal();
+    };
+    document.addEventListener("keydown", handleKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = "";
+    };
+  }, [showHeroModal, closeHeroModal]);
 
-  const handlePrimaryCTA = () => {
-    navigate("/signup");
-    console.log("Analytics: event.hero.primary_cta", { cta: "start_free" });
+  const handleJoinBibleWay = () => {
+    setShowHeroModal(true);
+    console.log("Analytics: event.join_bibleway_click");
   };
 
   const handleListenCTA = () => {
@@ -183,11 +191,11 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Header */}
-      <Header onSignIn={handleSignIn} onSignUp={handleSignUp} />
+      <Header onJoinBibleWay={handleJoinBibleWay} />
 
       {/* White Luxury Hero Section */}
       <WhiteHero
-        onPrimaryCTA={handlePrimaryCTA}
+        onPrimaryCTA={handleJoinBibleWay}
         onSecondaryCTA={handleWatchHowItWorks}
         heroImageUrl="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"
       />
@@ -628,11 +636,39 @@ export default function LandingPage() {
       {/* Modals */}
       <AudioPlayerModal open={audioModalOpen} onOpenChange={setAudioModalOpen} />
       <FeatureModal open={featureModalOpen} onOpenChange={setFeatureModalOpen} feature={selectedFeature} />
-      <YouTubeVideoModal 
-        open={videoModalOpen} 
-        onOpenChange={setVideoModalOpen} 
+      <YouTubeVideoModal
+        open={videoModalOpen}
+        onOpenChange={setVideoModalOpen}
         videoUrl={HOW_IT_WORKS_VIDEO_URL}
       />
+
+      {/* Hero Image Modal - rendered via portal to ensure it's above everything */}
+      {showHeroModal && createPortal(
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          style={{ zIndex: 99999 }}
+          onClick={closeHeroModal}
+        >
+          <div
+            className="relative max-w-4xl w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={closeHeroModal}
+              className="absolute top-3 right-3 z-10 bg-black/50 hover:bg-black/70 rounded-full p-2 shadow-lg transition-colors"
+              aria-label="Close"
+            >
+              <X className="h-5 w-5 text-white" />
+            </button>
+            <img
+              src="https://res.cloudinary.com/dlmiumywi/image/upload/v1772829772/biblewayheroimage_qgkzup.jpg"
+              alt="BibleWay - Launching on Easter April 8"
+              className="w-full h-auto rounded-2xl shadow-2xl"
+            />
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
