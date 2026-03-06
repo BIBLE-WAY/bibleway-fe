@@ -189,7 +189,7 @@ export default function LandingPage() {
       <WhiteHero
         onPrimaryCTA={handlePrimaryCTA}
         onSecondaryCTA={handleWatchHowItWorks}
-        heroImageUrl="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"
+        heroImageUrl="https://res.cloudinary.com/dlmiumywi/image/upload/v1772829772/biblewayheroimage_qgkzup.jpg"
       />
 
       {/* Discover BibleWay Section */}
@@ -365,7 +365,7 @@ export default function LandingPage() {
             <Card className="bg-white border-2 border-[var(--color-gray-100)] hover:border-[var(--color-gold)] hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden group">
               <div className="relative h-48 overflow-hidden">
                 <ImageWithFallback
-                  src="/Video Calls with Translation.jpg"
+                  src="https://res.cloudinary.com/dlmiumywi/image/upload/v1772829156/VIDEOCALL_va2gbh.png"
                   alt="Video call with live translation"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -390,7 +390,7 @@ export default function LandingPage() {
             <Card className="bg-white border-2 border-[var(--color-gray-100)] hover:border-[var(--color-gold)] hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden group">
               <div className="relative h-48 overflow-hidden">
                 <ImageWithFallback
-                  src="/Audio & Group Calls.jpg"
+                  src="https://res.cloudinary.com/dlmiumywi/image/upload/v1772829170/Audiocall_lh1d1x.png"
                   alt="Audio and group calls"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -415,7 +415,7 @@ export default function LandingPage() {
             <Card className="bg-white border-2 border-[var(--color-gray-100)] hover:border-[var(--color-gold)] hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden group">
               <div className="relative h-48 overflow-hidden">
                 <ImageWithFallback
-                  src="/Faith-Based Games.jpg"
+                  src="https://res.cloudinary.com/dlmiumywi/image/upload/v1772829154/games_iuvfai.png"
                   alt="Faith-based games and quizzes"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -440,7 +440,7 @@ export default function LandingPage() {
             <Card className="bg-white border-2 border-[var(--color-gray-100)] hover:border-[var(--color-gold)] hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden group sm:col-span-2 lg:col-span-1">
               <div className="relative h-48 overflow-hidden">
                 <ImageWithFallback
-                  src="/Social Media Posting.jpg"
+                  src="https://res.cloudinary.com/dlmiumywi/image/upload/v1772829159/socialmedia_s3vet6.png"
                   alt="Social media sharing and posting"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
