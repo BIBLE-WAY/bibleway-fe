@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
 interface HeaderProps {
@@ -12,6 +12,21 @@ interface HeaderProps {
 export function Header({ onSignIn, onSignUp }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showHeroModal, setShowHeroModal] = useState(false);
+
+  const closeModal = useCallback(() => setShowHeroModal(false), []);
+
+  useEffect(() => {
+    if (!showHeroModal) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeModal();
+    };
+    document.addEventListener("keydown", handleKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = "";
+    };
+  }, [showHeroModal, closeModal]);
 
   return (
     <>
@@ -63,18 +78,24 @@ export function Header({ onSignIn, onSignUp }: HeaderProps) {
 
       {/* Hero Image Modal */}
       {showHeroModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setShowHeroModal(false)}>
-          <div className="relative max-w-3xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={closeModal}
+        >
+          <div
+            className="relative max-w-4xl w-full animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
-              onClick={() => setShowHeroModal(false)}
-              className="absolute -top-3 -right-3 z-10 bg-white rounded-full p-1.5 shadow-lg hover:bg-gray-100 transition-colors"
+              onClick={closeModal}
+              className="absolute top-3 right-3 z-10 bg-black/50 hover:bg-black/70 rounded-full p-2 shadow-lg transition-colors"
               aria-label="Close"
             >
-              <X className="h-5 w-5 text-gray-700" />
+              <X className="h-5 w-5 text-white" />
             </button>
             <img
               src="https://res.cloudinary.com/dlmiumywi/image/upload/v1772829772/biblewayheroimage_qgkzup.jpg"
-              alt="BibleWay Hero"
+              alt="BibleWay - Launching on Easter April 8"
               className="w-full h-auto rounded-2xl shadow-2xl"
             />
           </div>

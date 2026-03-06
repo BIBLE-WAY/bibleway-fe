@@ -189,7 +189,7 @@ export default function LandingPage() {
       <WhiteHero
         onPrimaryCTA={handlePrimaryCTA}
         onSecondaryCTA={handleWatchHowItWorks}
-        heroImageUrl="https://res.cloudinary.com/dlmiumywi/image/upload/v1772829772/biblewayheroimage_qgkzup.jpg"
+        heroImageUrl="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"
       />
 
       {/* Discover BibleWay Section */}
