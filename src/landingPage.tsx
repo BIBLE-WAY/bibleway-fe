@@ -29,6 +29,10 @@ import {
   MessageCircle,
   Search,
   Video,
+  Languages,
+  Phone,
+  Gamepad2,
+  Share2,
 } from "lucide-react";
 
 // YouTube video URL for "How It Works" - Update this with your unlisted YouTube URL
@@ -141,6 +145,38 @@ export default function LandingPage() {
       description: "Audio packs, reading packs, and translation packs.",
       ctaId: "Feature.Downloads.LearnMore",
       details: "Download audio narrations, reading plans, and translations for offline access. Perfect for commutes, travel, or areas with limited connectivity.",
+    },
+    {
+      id: "videocalls",
+      icon: Languages,
+      title: "Video Calls with Translation",
+      description: "1-on-1 & group video calls with real-time translation.",
+      ctaId: "Feature.VideoCalls.LearnMore",
+      details: "Connect face-to-face with believers worldwide through private or group video calls with built-in real-time translation that breaks language barriers.",
+    },
+    {
+      id: "audiocalls",
+      icon: Phone,
+      title: "Audio & Group Calls",
+      description: "Crystal-clear audio calls for prayer circles and fellowship.",
+      ctaId: "Feature.AudioCalls.LearnMore",
+      details: "Stay connected through crystal-clear audio calls — one-on-one or in groups. Perfect for prayer circles, Bible study discussions, and fellowship on the go.",
+    },
+    {
+      id: "games",
+      icon: Gamepad2,
+      title: "Faith-Based Games",
+      description: "Bible trivia, word puzzles, and interactive quizzes.",
+      ctaId: "Feature.Games.LearnMore",
+      details: "Learn Scripture through fun and engaging games. From Bible trivia and word puzzles to interactive quizzes — grow your knowledge of God's Word with family and friends.",
+    },
+    {
+      id: "social",
+      icon: Share2,
+      title: "Social Media Posting",
+      description: "Share reflections, verses, and testimonies with your community.",
+      ctaId: "Feature.Social.LearnMore",
+      details: "Share your faith journey with the world. Post reflections, verse graphics, testimonies, and devotional thoughts directly from BibleWay to inspire your community.",
     },
   ];
 
@@ -321,6 +357,106 @@ export default function LandingPage() {
               <CardContent>
                 <CardDescription className="text-base text-[var(--text-secondary)] leading-relaxed">
                   Bring Scripture to life through powerful visual storytelling. Explore age-wise, segregated Bible content enriched with meaningful animations and cinematic visuals—designed to help you understand God's Word more deeply, remember it clearly, and apply it confidently in everyday life.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            {/* Feature 7 - Video Calls with Translation */}
+            <Card className="bg-white border-2 border-[var(--color-gray-100)] hover:border-[var(--color-gold)] hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden group">
+              <div className="relative h-48 overflow-hidden">
+                <ImageWithFallback
+                  src="/Video Calls with Translation.jpg"
+                  alt="Video call with live translation"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-dark-blue)]/60 to-transparent"></div>
+                <div className="absolute top-4 left-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/90 backdrop-blur-sm shadow-lg">
+                  <Languages className="h-6 w-6 text-[var(--color-gold)]" strokeWidth={2.5} />
+                </div>
+              </div>
+              <CardHeader className="pb-3">
+                <CardTitle className="font-serif text-xl lg:text-2xl text-[var(--color-dark-blue)] group-hover:text-[var(--color-maroon)] transition-colors">
+                  1-on-1 & Group Video Calls with Translation
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base text-[var(--text-secondary)] leading-relaxed">
+                  Connect face-to-face with believers worldwide through private or group video calls. Built-in real-time translation breaks language barriers so you can fellowship, pray, and study together — no matter what language you speak.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            {/* Feature 8 - Audio & Group Calls */}
+            <Card className="bg-white border-2 border-[var(--color-gray-100)] hover:border-[var(--color-gold)] hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden group">
+              <div className="relative h-48 overflow-hidden">
+                <ImageWithFallback
+                  src="/Audio & Group Calls.jpg"
+                  alt="Audio and group calls"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-dark-blue)]/60 to-transparent"></div>
+                <div className="absolute top-4 left-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/90 backdrop-blur-sm shadow-lg">
+                  <Phone className="h-6 w-6 text-[var(--color-gold)]" strokeWidth={2.5} />
+                </div>
+              </div>
+              <CardHeader className="pb-3">
+                <CardTitle className="font-serif text-xl lg:text-2xl text-[var(--color-dark-blue)] group-hover:text-[var(--color-maroon)] transition-colors">
+                  Audio Calls & Group Calls
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base text-[var(--text-secondary)] leading-relaxed">
+                  Stay connected through crystal-clear audio calls — one-on-one or in groups. Perfect for prayer circles, Bible study discussions, and fellowship when you're on the go.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            {/* Feature 9 - Games */}
+            <Card className="bg-white border-2 border-[var(--color-gray-100)] hover:border-[var(--color-gold)] hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden group">
+              <div className="relative h-48 overflow-hidden">
+                <ImageWithFallback
+                  src="/Faith-Based Games.jpg"
+                  alt="Faith-based games and quizzes"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-dark-blue)]/60 to-transparent"></div>
+                <div className="absolute top-4 left-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/90 backdrop-blur-sm shadow-lg">
+                  <Gamepad2 className="h-6 w-6 text-[var(--color-gold)]" strokeWidth={2.5} />
+                </div>
+              </div>
+              <CardHeader className="pb-3">
+                <CardTitle className="font-serif text-xl lg:text-2xl text-[var(--color-dark-blue)] group-hover:text-[var(--color-maroon)] transition-colors">
+                  Faith-Based Games
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base text-[var(--text-secondary)] leading-relaxed">
+                  Learn Scripture through fun and engaging games. From Bible trivia and word puzzles to interactive quizzes — grow your knowledge of God's Word while enjoying quality time with family and friends.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            {/* Feature 10 - Social Media Posting */}
+            <Card className="bg-white border-2 border-[var(--color-gray-100)] hover:border-[var(--color-gold)] hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden group sm:col-span-2 lg:col-span-1">
+              <div className="relative h-48 overflow-hidden">
+                <ImageWithFallback
+                  src="/Social Media Posting.jpg"
+                  alt="Social media sharing and posting"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-dark-blue)]/60 to-transparent"></div>
+                <div className="absolute top-4 left-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/90 backdrop-blur-sm shadow-lg">
+                  <Share2 className="h-6 w-6 text-[var(--color-gold)]" strokeWidth={2.5} />
+                </div>
+              </div>
+              <CardHeader className="pb-3">
+                <CardTitle className="font-serif text-xl lg:text-2xl text-[var(--color-dark-blue)] group-hover:text-[var(--color-maroon)] transition-colors">
+                  Social Media Posting
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base text-[var(--text-secondary)] leading-relaxed">
+                  Share your faith journey with the world. Post reflections, verse graphics, testimonies, and devotional thoughts directly from BibleWay to inspire and encourage your community.
                 </CardDescription>
               </CardContent>
             </Card>
